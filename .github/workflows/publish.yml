@@ -1,11 +1,23 @@
 name: Publish
 
-# Runs when a GitHub Release appears, which release-please creates by merging
-# its release pull request. Packagist needs no upload and no token: its GitHub
+# Called by release-please.yml once it has cut a release, and usable on its own
+# if a release is ever published by hand.
+#
+# A release created with GITHUB_TOKEN does not trigger `on: release`, which is
+# GitHub's guard against workflows setting each other off. So the release job
+# calls this one directly rather than relying on the event.
+#
+# Packagist needs no upload and no token: its GitHub
 # App reads the tag from this repository. This job proves the release is sound
 # and attaches the archive that Composer will serve.
 
 on:
+  workflow_call:
+    inputs:
+      tag:
+        description: The tag to publish, for example v0.1.0.
+        required: true
+        type: string
   release:
     types: [published]
 
@@ -21,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ inputs.tag || github.event.release.tag_name }}
           persist-credentials: false
 
       - name: CI passed on this commit
@@ -49,10 +61,12 @@ jobs:
       - uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # v3.1.1
 
       - name: Tag matches the VERSION constant
+        env:
+          TAG: ${{ inputs.tag || github.event.release.tag_name }}
         run: |
           version="$(php -r 'require "src/Client.php"; echo Checkslip\Client::VERSION;')"
-          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
-            echo "::error::tag ${GITHUB_REF_NAME} does not match Client::VERSION ${version}"
+          if [ "v${version}" != "${TAG}" ]; then
+            echo "::error::tag ${TAG} does not match Client::VERSION ${version}"
             exit 1
           fi
 
@@ -66,6 +80,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          name="checkslip-sdk-${GITHUB_REF_NAME}.tar.gz"
-          git archive --format=tar.gz --prefix="checkslip-sdk-${GITHUB_REF_NAME}/" -o "$name" HEAD
-          gh release upload "${GITHUB_REF_NAME}" "$name" --clobber
+          name="checkslip-sdk-${TAG}.tar.gz"
+          git archive --format=tar.gz --prefix="checkslip-sdk-${TAG}/" -o "$name" HEAD
+          gh release upload "${TAG}" "$name" --clobber
