@@ -26,11 +26,9 @@ final class SlipCheck
         public readonly Slip|SlipSummary $slip,
         public readonly ?DuplicateOf $duplicateOf = null,
         public readonly ?string $clientReference = null,
-        // TEMPORARY, remove when verify 0.61.0 is live (checkslip/pm h-mw94dkac8a0,
-        // 9 Nov 2026): verify took latency_ms, upstream_ms and checked_elsewhere
-        // out of the contract, but that has not reached main or deploy yet, so
-        // the public openapi.json still lists them. They stay out of the SDK
-        // until pm sends the regenerated spec, then this note goes away.
+        // latency_ms, upstream_ms and checked_elsewhere are being withdrawn
+        // from the Checkslip API. The SDK does not carry them, so your code
+        // will not break when the API stops sending them.
         /**
          * Seconds the API asked you to wait before reading the result again.
          * Set only on a PENDING answer (HTTP 202).

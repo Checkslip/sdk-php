@@ -191,8 +191,8 @@ final class ResourcesTest extends TestCase
         self::assertSame('api_key.created', $event->action);
         self::assertSame(['name' => 'shop'], $event->after);
 
-        // The public openapi.json decides what a customer sees (pm, 9 Nov 2026).
-        // These left the contract, so no model may carry them.
+        // The published OpenAPI document decides what the SDK exposes. These
+        // fields left it, so no model may carry them.
         foreach (['traceId', 'upstreamMs', 'recordedBy', 'build', 'chain', 'redactions'] as $field) {
             self::assertFalse(property_exists(ApiRequestRecord::class, $field), $field);
         }

@@ -217,9 +217,8 @@ final class SlipsTest extends TestCase
 
     public function testTheContractDecidesWhatIsExposed(): void
     {
-        // verify 0.61.0 takes these three out of the contract. It has not
-        // deployed yet, so pm asked for them to stay out of the SDK until the
-        // regenerated spec arrives (h-mw94dkac8a0, 9 Nov 2026).
+        // These three are being withdrawn from the Checkslip API, so the
+        // SDK does not expose them.
         foreach (['checkedElsewhere', 'latencyMs', 'upstreamMs'] as $field) {
             self::assertFalse(property_exists(SlipCheck::class, $field), $field);
             self::assertFalse(property_exists(SlipCheckRecord::class, $field), $field);

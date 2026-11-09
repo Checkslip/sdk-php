@@ -11,8 +11,8 @@ use Checkslip\Resource\AbstractResource;
 use Checkslip\Tests\TestCase;
 
 /**
- * Guards the cross-language SDK contract in docs/sdk-naming.md, so the four
- * SDKs cannot drift apart again.
+ * Guards the surface the four Checkslip SDKs share, so the clients cannot
+ * drift apart.
  */
 final class ContractTest extends TestCase
 {
