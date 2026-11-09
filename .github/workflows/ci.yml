@@ -4,6 +4,15 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Callable so the release job can run the full suite against its own release
+  # branch: a pull request opened with GITHUB_TOKEN does not raise events, so
+  # it would otherwise get no checks at all.
+  workflow_call:
+    inputs:
+      ref:
+        description: The ref to check out. Defaults to the triggering ref.
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -18,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.ref }}
       - uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401 # v2.35.5
         with:
           php-version: "8.3"
@@ -35,6 +46,8 @@ jobs:
         php: ["8.2", "8.3", "8.4"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.ref }}
       - uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401 # v2.35.5
         with:
           php-version: ${{ matrix.php }}
@@ -47,6 +60,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.ref }}
       - uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401 # v2.35.5
         with:
           php-version: "8.2"
