@@ -4,6 +4,18 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.1.1](https://github.com/Checkslip/sdk-php/compare/v0.1.0...v0.1.1) (2026-11-09)
+
+
+### Bug Fixes
+
+* **ci:** bump the version constant and stop CI cancelling itself ([99455d0](https://github.com/Checkslip/sdk-php/commit/99455d0d0914a220c66dd014d1feb37e2ffb30c2))
+* **ci:** call publish from the release job ([748fc56](https://github.com/Checkslip/sdk-php/commit/748fc5608bba74bdcece995e9953dfb42d680a2f))
+* **ci:** check the release pull request before it is merged ([412510e](https://github.com/Checkslip/sdk-php/commit/412510ea05ce21941bb7c46857ac8de595f0b8b5))
+* **ci:** give the artifact step the tag it uses ([2402240](https://github.com/Checkslip/sdk-php/commit/24022400f060e43f2a4d339ce4ef7b9f9355dc81))
+* **ci:** publish through the release workflow, never directly ([b6077e3](https://github.com/Checkslip/sdk-php/commit/b6077e3bab64c629aec8d7a69cd08aacabf00abc))
+* **ci:** stop the publish job waiting for itself ([5128665](https://github.com/Checkslip/sdk-php/commit/5128665b855dcfc34b744b6333c6224cd21fad80))
+
 ## 0.1.0 (2026-11-09)
 
 
