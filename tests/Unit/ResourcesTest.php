@@ -47,6 +47,30 @@ final class ResourcesTest extends TestCase
         self::assertSame(20, $u->totals->checks);
     }
 
+    public function testAuditRequestFiltersTakeOneValueOrSeveral(): void
+    {
+        // style=form with explode=true, so each value gets its own key.
+        $this->http->addResponse(self::json(200, ['items' => [], 'next_cursor' => null]));
+        $this->client()->audit->requests->list(
+            httpStatus: [200, 429],
+            outcomeCode: ['FOUND', 'NOT_FOUND'],
+            route: ['/api/slips/lookup', '/api/usage'],
+            channel: [Channel::Api, Channel::Dashboard],
+        );
+        $query = $this->lastRequest()->getUri()->getQuery();
+        foreach (['http_status=200', 'http_status=429', 'outcome_code=FOUND', 'outcome_code=NOT_FOUND', 'channel=API', 'channel=DASHBOARD'] as $pair) {
+            self::assertStringContainsString($pair, $query);
+        }
+        self::assertStringContainsString('route=' . rawurlencode('/api/slips/lookup'), $query);
+
+        // One value still works, and reads better for a single filter.
+        $this->http->addResponse(self::json(200, ['items' => [], 'next_cursor' => null]));
+        $this->client()->audit->requests->list(httpStatus: 429, channel: Channel::Api);
+        $one = $this->lastRequest()->getUri()->getQuery();
+        self::assertStringContainsString('http_status=429', $one);
+        self::assertStringContainsString('channel=API', $one);
+    }
+
     public function testBanks(): void
     {
         $this->http->addResponse(self::json(200, self::fixture('banks')));

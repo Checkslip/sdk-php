@@ -6,6 +6,9 @@ namespace Checkslip\Enum;
 
 /**
  * Why a lookup used no credit.
+ *
+ * A customer receives NOT_FOUND, DUPLICATE, UNAVAILABLE, INVALID_QR, INVALID_FILE, QR_TAMPERED, TOO_OLD, SYSTEM_ERROR and OTHER.
+ * The other cases exist inside the API and do not reach you.
  */
 enum FreeReason: string
 {
