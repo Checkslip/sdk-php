@@ -34,9 +34,8 @@ final class SlipCheckRecord
         /** True when the lookup used a credit. Null while it is not settled. */
         public readonly ?bool $charged = null,
         public readonly FreeReason|string|null $freeReason = null,
-        // latency_ms, upstream_ms and checked_elsewhere are being withdrawn
-        // from the Checkslip API. The SDK does not carry them, so your code
-        // will not break when the API stops sending them.
+        // latency_ms, upstream_ms and checked_elsewhere left the Checkslip
+        // API, so this client does not carry them.
     ) {}
 
     /**

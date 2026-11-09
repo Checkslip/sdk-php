@@ -8,7 +8,7 @@ namespace Checkslip\Enum;
  * Columns you can pick for a slip export CSV.
  *
  * latency_ms, upstream_ms and checked_elsewhere are deliberately absent:
- * they are being withdrawn from the Checkslip API, so they are not offered
+ * they left the Checkslip API, so they are not offered
  * as export columns.
  */
 enum ExportColumn: string

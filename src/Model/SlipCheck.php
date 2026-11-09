@@ -26,9 +26,8 @@ final class SlipCheck
         public readonly Slip|SlipSummary $slip,
         public readonly ?DuplicateOf $duplicateOf = null,
         public readonly ?string $clientReference = null,
-        // latency_ms, upstream_ms and checked_elsewhere are being withdrawn
-        // from the Checkslip API. The SDK does not carry them, so your code
-        // will not break when the API stops sending them.
+        // latency_ms, upstream_ms and checked_elsewhere left the Checkslip
+        // API, so this client does not carry them.
         /**
          * Seconds the API asked you to wait before reading the result again.
          * Set only on a PENDING answer (HTTP 202).
