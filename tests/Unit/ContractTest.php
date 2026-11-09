@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Checkslip\Tests\Unit;
 
+use Checkslip\Enum\FreeReason;
 use Checkslip\Enum\Outcome;
 use Checkslip\Model\ApiRequestRecord;
 use Checkslip\Model\SlipCheck;
+use Checkslip\Model\UsageCounts;
 use Checkslip\Resource\AbstractResource;
 use Checkslip\Tests\TestCase;
 
@@ -180,5 +182,39 @@ final class ContractTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->client()->slips->lookup(slip: '   ');
+    }
+
+    /**
+     * The API added free_other, stopped counting free_no_credit and
+     * free_hold_expired, and will drop those two fields. The SDK and the API
+     * are deployed separately, so both shapes have to parse.
+     */
+    public function testUsageCountsParseWithOrWithoutTheDeprecatedFields(): void
+    {
+        $common = [
+            'checks' => 12,
+            'charged' => 7,
+            'free_not_found' => 1,
+            'free_duplicate' => 0,
+            'free_unavailable' => 0,
+            'free_invalid_qr' => 0,
+            'free_invalid_file' => 0,
+            'free_qr_tampered' => 0,
+            'free_too_old' => 0,
+            'free_system_error' => 0,
+        ];
+
+        $before = UsageCounts::fromArray($common + ['free_no_credit' => 3, 'free_hold_expired' => 2]);
+        self::assertSame(3, $before->freeNoCredit);
+        self::assertSame(2, $before->freeHoldExpired);
+        self::assertSame(0, $before->freeOther, 'a server without the field counts nothing there');
+
+        $after = UsageCounts::fromArray($common + ['free_other' => 5]);
+        self::assertSame(5, $after->freeOther);
+        self::assertSame(0, $after->freeNoCredit);
+        self::assertSame(0, $after->freeHoldExpired);
+
+        self::assertSame('OTHER', FreeReason::Other->value);
+        self::assertSame(FreeReason::Other, FreeReason::tryFrom('OTHER'));
     }
 }
