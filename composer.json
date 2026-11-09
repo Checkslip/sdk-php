@@ -1,0 +1,84 @@
+{
+    "name": "checkslip/sdk",
+    "description": "Official PHP SDK for the Checkslip API: look up Thai bank transfers from a slip QR or image with the sending bank.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "checkslip",
+        "slip",
+        "thai",
+        "thailand",
+        "bank",
+        "transfer",
+        "promptpay",
+        "qr",
+        "api",
+        "sdk",
+        "psr-18"
+    ],
+    "homepage": "https://checkslip.com/docs",
+    "authors": [
+        {
+            "name": "Checkslip",
+            "homepage": "https://checkslip.com"
+        }
+    ],
+    "support": {
+        "docs": "https://checkslip.com/docs",
+        "issues": "https://github.com/checkslip/checkslip-php/issues",
+        "source": "https://github.com/checkslip/checkslip-php",
+        "security": "https://github.com/checkslip/checkslip-php/security/policy"
+    },
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "php-http/discovery": "^1.19",
+        "psr/http-client": "^1.0",
+        "psr/http-client-implementation": "*",
+        "psr/http-factory": "^1.0",
+        "psr/http-factory-implementation": "*",
+        "psr/http-message": "^1.1 || ^2.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "guzzlehttp/guzzle": "^7.8",
+        "php-http/mock-client": "^1.6",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpunit/phpunit": "^10.5 || ^11.0",
+        "symfony/http-client": "^6.4 || ^7.0"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "A PSR-18 HTTP client; the SDK applies the timeout option to it.",
+        "symfony/http-client": "A PSR-18 HTTP client (with nyholm/psr7); the SDK applies the timeout option to it."
+    },
+    "autoload": {
+        "psr-4": {
+            "Checkslip\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Checkslip\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "stan": "phpstan analyse --memory-limit=1G",
+        "cs": "php-cs-fixer fix --dry-run --diff",
+        "cs:fix": "php-cs-fixer fix",
+        "check": [
+            "@cs",
+            "@stan",
+            "@test"
+        ]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
