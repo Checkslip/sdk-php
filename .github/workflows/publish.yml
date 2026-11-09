@@ -89,6 +89,7 @@ jobs:
 
       - name: Attach the archive to the release
         env:
+          TAG: ${{ inputs.tag || github.event.release.tag_name }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
