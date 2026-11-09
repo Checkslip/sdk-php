@@ -4,6 +4,17 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.2.0](https://github.com/Checkslip/sdk-php/compare/v0.1.1...v0.2.0) (2026-11-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* **usage:** free_no_credit and free_hold_expired are deprecated and will disappear. The API no longer counts either reason, so both are always 0 and both fields will be removed from the response. They are optional from this version, so code that reads them has to handle them being absent. The counts they used to carry are in free_other.
+
+### Features
+
+* **usage:** add free_other and retire two free counts ([f169ade](https://github.com/Checkslip/sdk-php/commit/f169ade04684b75c477ff36fef59252eabefb9c4))
+
 ## [0.1.1](https://github.com/Checkslip/sdk-php/compare/v0.1.0...v0.1.1) (2026-11-09)
 
 
