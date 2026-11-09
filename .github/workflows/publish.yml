@@ -1,0 +1,71 @@
+name: Publish
+
+# Runs when a GitHub Release appears, which release-please creates by merging
+# its release pull request. Packagist needs no upload and no token: its GitHub
+# App reads the tag from this repository. This job proves the release is sound
+# and attaches the archive that Composer will serve.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Verify the release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # attach the archive to the release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
+
+      - name: CI passed on this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          sha="$(git rev-parse HEAD)"
+          for attempt in $(seq 1 40); do
+            state="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${sha}/check-runs" \
+              --jq '[.check_runs[] | select(.name != "Verify the release")] | if length == 0 then "pending" elif any(.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out") then "failed" elif all(.status == "completed") then "passed" else "pending" end')"
+            case "$state" in
+              passed) echo "checks passed for $sha"; exit 0 ;;
+              failed) echo "::error::checks failed for $sha; not releasing"; exit 1 ;;
+              *) echo "waiting for checks on $sha ($attempt/40)"; sleep 30 ;;
+            esac
+          done
+          echo "::error::checks did not finish in time for $sha"
+          exit 1
+
+      - uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401 # v2.35.5
+        with:
+          php-version: "8.3"
+          coverage: none
+      - uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # v3.1.1
+
+      - name: Tag matches the VERSION constant
+        run: |
+          version="$(php -r 'require "src/Client.php"; echo Checkslip\Client::VERSION;')"
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match Client::VERSION ${version}"
+            exit 1
+          fi
+
+      - run: composer validate --strict
+      - run: composer cs
+      - run: composer stan
+      - run: composer test
+
+      - name: Attach the archive to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          name="checkslip-sdk-${GITHUB_REF_NAME}.tar.gz"
+          git archive --format=tar.gz --prefix="checkslip-sdk-${GITHUB_REF_NAME}/" -o "$name" HEAD
+          gh release upload "${GITHUB_REF_NAME}" "$name" --clobber
