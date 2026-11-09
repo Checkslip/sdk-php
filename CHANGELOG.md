@@ -4,6 +4,13 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.3.0](https://github.com/Checkslip/sdk-php/compare/v0.2.0...v0.3.0) (2026-11-09)
+
+
+### Features
+
+* **audit:** take several values per request filter ([76d50ac](https://github.com/Checkslip/sdk-php/commit/76d50acc4ad9e88624ff786eb0402bbed7835959))
+
 ## [0.2.0](https://github.com/Checkslip/sdk-php/compare/v0.1.1...v0.2.0) (2026-11-09)
 
 
