@@ -4,6 +4,28 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## 0.1.0 (2026-11-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* **api:** nest resources to match the shared surface
+
+### Features
+
+* add the Checkslip API client with typed models ([68257df](https://github.com/Checkslip/sdk-php/commit/68257df44ce01e951510e950bf645dfc4756d9ea))
+
+
+### Miscellaneous Chores
+
+* cut the first release as 0.1.0 ([5fade17](https://github.com/Checkslip/sdk-php/commit/5fade172f7674101eec36fa4e2abca1b3240aeba))
+* set up the composer package and its tooling ([d03cb58](https://github.com/Checkslip/sdk-php/commit/d03cb587d97a250693075af59e6b7f42f53ab241))
+
+
+### Code Refactoring
+
+* **api:** nest resources to match the shared surface ([19be258](https://github.com/Checkslip/sdk-php/commit/19be2583e42f89dda78ead061bcda5c7f5f0e014))
+
 ## [Unreleased]
 
 ## [0.1.0] - 2026-11-09
