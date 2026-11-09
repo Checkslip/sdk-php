@@ -17,7 +17,11 @@ enum FreeReason: string
     case InvalidFile = 'INVALID_FILE';
     case QrTampered = 'QR_TAMPERED';
     case TooOld = 'TOO_OLD';
+    /** No longer sent. The API sends OTHER in its place. */
     case NoCredit = 'NO_CREDIT';
+    /** No longer sent either, and replaced by OTHER the same way. */
     case HoldExpired = 'HOLD_EXPIRED';
     case SystemError = 'SYSTEM_ERROR';
+    /** The lookup was not charged and no reason was given. */
+    case Other = 'OTHER';
 }
