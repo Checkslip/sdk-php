@@ -80,6 +80,31 @@ final class Query
     }
 
     /**
+     * One value or several, for a parameter the API reads as a repeated key
+     * (style=form, explode=true). Accepting both keeps a single filter
+     * readable while a list stays possible.
+     *
+     * @param \BackedEnum|string|int|list<\BackedEnum|string|int>|null $value
+     *
+     * @return list<string>|null
+     */
+    public static function many(\BackedEnum|string|int|array|null $value): ?array
+    {
+        if ($value === null) {
+            return null;
+        }
+        $values = \is_array($value) ? array_values($value) : [$value];
+        if ($values === []) {
+            return null;
+        }
+
+        return array_map(
+            static fn(\BackedEnum|string|int $one): string => $one instanceof \BackedEnum ? (string) $one->value : (string) $one,
+            $values,
+        );
+    }
+
+    /**
      * @param list<\BackedEnum|string> $values
      *
      * @return list<string>
