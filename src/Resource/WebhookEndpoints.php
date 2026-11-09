@@ -25,6 +25,17 @@ final class WebhookEndpoints extends AbstractResource
     }
 
     /**
+     * Every matching item across all pages.
+     *
+     * @return \Generator<int, Endpoint>
+     */
+    public function listAll(?int $limit = null, ?string $cursor = null): \Generator
+    {
+        return $this->list($limit, $cursor)->autoPaging();
+    }
+
+
+    /**
      * Registers a URL of your system. The URL must be https and resolve only to
      * public addresses. The response holds the signing secret, shown only this once.
      *

@@ -17,7 +17,6 @@ final class AuditEventRecord
     /**
      * @param array<string, mixed>|null $before
      * @param array<string, mixed>|null $after
-     * @param list<array{path: string, reason: string}> $redactions
      */
     public function __construct(
         public readonly string $eventId,
@@ -26,7 +25,6 @@ final class AuditEventRecord
         /** SUCCESS, FAILURE or DENIED. */
         public readonly string $outcome,
         public readonly \DateTimeImmutable $occurredAt,
-        public readonly ?string $causationId,
         public readonly ?string $requestId,
         public readonly ActorType|string $actorType,
         public readonly ?string $actorId,
@@ -40,7 +38,6 @@ final class AuditEventRecord
         public readonly ?array $after,
         public readonly ?string $reason,
         public readonly ?string $undoOfEventId,
-        public readonly array $redactions,
     ) {}
 
     /**
@@ -56,7 +53,6 @@ final class AuditEventRecord
             Arr::str($d, 'category'),
             Arr::str($d, 'outcome'),
             Arr::date($d, 'occurred_at'),
-            Arr::strOrNull($d, 'causation_id'),
             Arr::strOrNull($d, 'request_id'),
             Enums::of(ActorType::class, Arr::str($actor, 'type')),
             Arr::strOrNull($actor, 'id'),
@@ -69,7 +65,6 @@ final class AuditEventRecord
             Arr::objOrNull($d, 'after'),
             Arr::strOrNull($d, 'reason'),
             Arr::strOrNull($d, 'undo_of_event_id'),
-            ApiRequestRecord::redactions($d),
         );
     }
 }

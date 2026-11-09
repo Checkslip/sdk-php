@@ -37,6 +37,24 @@ final class WebhookDeliveries extends AbstractResource
     }
 
     /**
+     * Every matching item across all pages.
+     *
+     * @return \Generator<int, Delivery>
+     */
+    public function listAll(
+        ?string $endpointId = null,
+        DeliveryStatus|string|null $status = null,
+        EventType|string|null $eventType = null,
+        \DateTimeInterface|string|null $since = null,
+        \DateTimeInterface|string|null $until = null,
+        ?int $limit = null,
+        ?string $cursor = null,
+    ): \Generator {
+        return $this->list($endpointId, $status, $eventType, $since, $until, $limit, $cursor)->autoPaging();
+    }
+
+
+    /**
      * One delivery with its payload and every attempt.
      */
     public function get(string $deliveryId): DeliveryDetail

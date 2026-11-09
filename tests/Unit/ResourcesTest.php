@@ -26,7 +26,7 @@ final class ResourcesTest extends TestCase
     public function testBalance(): void
     {
         $this->http->addResponse(self::json(200, self::fixture('balance')));
-        $b = $this->client()->billing->balance();
+        $b = $this->client()->billing->balance->get();
 
         self::assertSame(1250, $b->credits);
         self::assertFalse($b->low);
@@ -64,16 +64,16 @@ final class ResourcesTest extends TestCase
         $this->http->addResponse(self::json(200, self::fixture('receipt')));
         $billing = $this->client()->billing;
 
-        $packages = $billing->packages();
+        $packages = $billing->packages->list();
         self::assertTrue($packages->checkoutOpen);
         self::assertSame('199.00', $packages->items[0]->price->toBaht());
 
-        $orders = $billing->orders(status: OrderStatus::Paid);
+        $orders = $billing->orders->list(status: OrderStatus::Paid);
         self::assertSame('status=PAID', $this->lastRequest()->getUri()->getQuery());
         self::assertInstanceOf(Order::class, $orders->items[0]);
         self::assertSame(PaymentMethod::PromptPay, $orders->items[0]->paymentMethod);
 
-        $receipt = $billing->receipt('0192d4e0-0000-7000-8000-0000000000d2');
+        $receipt = $billing->receipts->get('0192d4e0-0000-7000-8000-0000000000d2');
         self::assertSame(700, $receipt->vat?->rateBp);
         self::assertSame('บริษัท โฮโลแกรม จำกัด', $receipt->seller['name']);
         self::assertSame(BuyerType::Company, $receipt->buyer->buyerType);
@@ -82,7 +82,7 @@ final class ResourcesTest extends TestCase
     public function testLedgerJoinsReasons(): void
     {
         $this->http->addResponse(self::json(200, ['items' => [], 'next_cursor' => null]));
-        $this->client()->billing->ledger(reason: [CreditReason::Purchase, CreditReason::Expire]);
+        $this->client()->billing->ledger->list(reason: [CreditReason::Purchase, CreditReason::Expire]);
 
         self::assertSame('reason=PURCHASE%2CEXPIRE', $this->lastRequest()->getUri()->getQuery());
     }
@@ -90,7 +90,7 @@ final class ResourcesTest extends TestCase
     public function testUpdateBillingInfoSendsOnlySetFields(): void
     {
         $this->http->addResponse(self::json(200, ['buyer_type' => 'PERSON', 'name' => 'สมชาย']));
-        $info = $this->client()->billing->updateBillingInfo(new BillingInfo(buyerType: BuyerType::Person, name: 'สมชาย'));
+        $info = $this->client()->billing->info->update(new BillingInfo(buyerType: BuyerType::Person, name: 'สมชาย'));
 
         self::assertSame('PUT', $this->lastRequest()->getMethod());
         self::assertSame(['buyer_type' => 'PERSON', 'name' => 'สมชาย'], self::body($this->lastRequest()));
@@ -171,7 +171,7 @@ final class ResourcesTest extends TestCase
     public function testEventTypes(): void
     {
         $this->http->addResponse(self::json(200, ['items' => [['type' => 'slip.checked', 'description' => 'A lookup finished', 'subscribable' => true]]]));
-        $types = $this->client()->webhooks->eventTypes();
+        $types = $this->client()->webhooks->eventTypes->list();
 
         self::assertSame(EventType::SlipChecked, $types[0]->type);
     }
@@ -182,22 +182,26 @@ final class ResourcesTest extends TestCase
         $this->http->addResponse(self::json(200, self::fixture('audit-event')));
         $client = $this->client();
 
-        $req = $client->audit->requests(channel: Channel::Api, transRef: '630210534087')->items[0];
+        $req = $client->audit->requests->list(channel: Channel::Api, transRef: '630210534087')->items[0];
         self::assertSame('channel=API&trans_ref=630210534087', $this->lastRequest()->getUri()->getQuery());
         self::assertSame(200, $req->httpStatus);
         self::assertSame(['qr_sha256' => str_repeat('e', 64), 'trans_ref' => '630210534087'], $req->fingerprint);
 
-        $event = $client->audit->event('0192d4e0-0000-7000-8000-0000000000a1');
+        $event = $client->audit->events->get('0192d4e0-0000-7000-8000-0000000000a1');
         self::assertSame('api_key.created', $event->action);
         self::assertSame(['name' => 'shop'], $event->after);
-        self::assertSame([['path' => '/after/note', 'reason' => 'free_text']], $event->redactions);
 
-        foreach (['traceId', 'latencyMs', 'upstreamMs', 'recordedBy', 'build', 'chain'] as $field) {
+        // The public openapi.json decides what a customer sees (pm, 9 Nov 2026).
+        // These left the contract, so no model may carry them.
+        foreach (['traceId', 'upstreamMs', 'recordedBy', 'build', 'chain', 'redactions'] as $field) {
             self::assertFalse(property_exists(ApiRequestRecord::class, $field), $field);
         }
-        foreach (['sourceDomain', 'build', 'chain'] as $field) {
+        foreach (['sourceDomain', 'build', 'chain', 'redactions', 'causationId', 'actorAssurance'] as $field) {
             self::assertFalse(property_exists(AuditEventRecord::class, $field), $field);
         }
+        // latency_ms stayed, and the contract marks it required.
+        self::assertTrue(property_exists(ApiRequestRecord::class, 'latencyMs'));
+        self::assertSame(812, $req->latencyMs);
     }
 
     public function testEvidenceExportFlow(): void
@@ -206,14 +210,14 @@ final class ResourcesTest extends TestCase
         $this->http->addResponse(new Response(200, ['Content-Type' => 'application/x-ndjson'], "{\"kind\":\"MANIFEST\"}\n"));
         $client = $this->client();
 
-        $export = $client->audit->createExport('2026-11-01', new \DateTimeImmutable('2026-11-02'), streams: [Stream::ApiRequests]);
+        $export = $client->audit->exports->create('2026-11-01', new \DateTimeImmutable('2026-11-02'), streams: [Stream::AuditEvents]);
         $create = $this->lastRequest();
-        self::assertSame(['from_day' => '2026-11-01', 'to_day' => '2026-11-02', 'streams' => ['API_REQUESTS']], self::body($create));
+        self::assertSame(['from_day' => '2026-11-01', 'to_day' => '2026-11-02', 'streams' => ['AUDIT_EVENTS']], self::body($create));
         self::assertNotSame('', $create->getHeaderLine('Idempotency-Key'));
         self::assertSame(ExportState::Ready, $export->status);
         self::assertSame(str_repeat('a', 64), $export->sha256);
 
-        $file = $client->audit->downloadExport($export->exportId);
+        $file = $client->audit->exports->download($export->exportId);
         self::assertStringContainsString('MANIFEST', (string) $file);
         self::assertSame('/api/audit/exports/0192d4e0-0000-7000-8000-0000000000e1/file', $this->lastRequest()->getUri()->getPath());
     }
@@ -224,6 +228,6 @@ final class ResourcesTest extends TestCase
         $order['status'] = 'REFUNDED';
         $this->http->addResponse(self::json(200, $order));
 
-        self::assertSame('REFUNDED', $this->client()->billing->order('x')->status);
+        self::assertSame('REFUNDED', $this->client()->billing->orders->get('x')->status);
     }
 }

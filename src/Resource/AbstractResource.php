@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Checkslip\Resource;
 
 use Checkslip\Internal\Arr;
+use Checkslip\Internal\Query;
 use Checkslip\Internal\Transport;
 use Checkslip\Internal\Uuid;
 use Checkslip\Page;
@@ -52,6 +53,18 @@ abstract class AbstractResource
     protected static function idempotency(?string $key): array
     {
         return ['Idempotency-Key' => $key ?? Uuid::v4()];
+    }
+
+    /**
+     * The charged filter takes true, false and "unsettled" as strings.
+     *
+     * @param list<bool|string>|null $charged
+     *
+     * @return list<string>|null
+     */
+    protected static function charged(?array $charged): ?array
+    {
+        return Query::list($charged === null ? null : array_map(static fn(bool|string $c): string => \is_bool($c) ? ($c ? 'true' : 'false') : $c, $charged));
     }
 
     protected static function path(string $format, string|int ...$ids): string

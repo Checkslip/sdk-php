@@ -30,7 +30,9 @@ final class EvidenceExport
         /** SHA-256 of the file, hex. Set once the file is READY. */
         public readonly ?string $sha256,
         public readonly ?int $sizeBytes,
-        /** File format, such as "checkslip-audit-export/2". */
+        /** How many records the file holds. Set once it is READY. */
+        public readonly ?int $recordCount,
+        /** File format, "checkslip-audit-export/3". */
         public readonly ?string $format,
     ) {}
 
@@ -52,6 +54,7 @@ final class EvidenceExport
             Arr::dateOrNull($d, 'expires_at'),
             Arr::strOrNull($manifest, 'sha256'),
             Arr::intOrNull($manifest, 'size_bytes'),
+            Arr::intOrNull($manifest, 'record_count'),
             Arr::strOrNull($manifest, 'format'),
         );
     }

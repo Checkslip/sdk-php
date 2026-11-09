@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Checkslip\Resource;
 
 use Checkslip\Enum\CountBucket;
-use Checkslip\Enum\ExportColumn;
 use Checkslip\Enum\FreeReason;
 use Checkslip\Enum\Outcome;
 use Checkslip\Internal\Multipart;
@@ -15,20 +14,31 @@ use Checkslip\Internal\Transport;
 use Checkslip\Model\SlipCheck;
 use Checkslip\Model\SlipCheckRecord;
 use Checkslip\Model\SlipCounts;
-use Checkslip\Model\SlipExport;
-use Checkslip\Model\SlipExportPart;
 use Checkslip\Page;
 use Checkslip\Upload;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * Transfer lookups and their history.
  */
 final class Slips extends AbstractResource
 {
+    /** CSV exports of past lookups. */
+    public readonly SlipExports $exports;
+
+    public function __construct(Transport $transport)
+    {
+        parent::__construct($transport);
+        $this->exports = new SlipExports($transport);
+    }
+
     /**
-     * Looks a transfer up with the sending bank, from the QR text on the slip.
+     * Looks a transfer up with the sending bank.
+     *
+     * Pass the text read from the slip's QR code, or an {@see Upload} of the
+     * slip image. Checkslip reads the QR in an image and does not keep it.
+     * JPEG, PNG or WebP, up to 10 MB and 50 megapixels; other files get
+     * INVALID_FILE and use no credit.
      *
      * Every lookup carries an Idempotency-Key. Pass your own (for example your
      * order id plus the slip's QR) so a retry after a crash or a timeout returns
@@ -38,38 +48,34 @@ final class Slips extends AbstractResource
      * A failed lookup (INVALID_QR, QR_TAMPERED, TOO_OLD, ...) throws
      * {@see \Checkslip\Exception\UnprocessableEntityException} and uses no credit.
      *
-     * @param string $qr The text read from the slip's QR code.
+     * ```php
+     * $client->slips->lookup($qrText);
+     * $client->slips->lookup(Upload::fromPath('/tmp/slip.jpg'));
+     * ```
+     *
+     * @param string|Upload $slip The QR text, or the slip image.
      * @param string|null $clientReference Your own id for this lookup, such as an order number (printable ASCII, at most 128).
      */
-    public function lookup(string $qr, ?string $clientReference = null, ?string $idempotencyKey = null): SlipCheck
+    public function lookup(string|Upload $slip, ?string $clientReference = null, ?string $idempotencyKey = null): SlipCheck
     {
-        $body = ['qr' => $qr];
+        if ($slip instanceof Upload) {
+            $form = Multipart::build($slip, 'image', ['client_reference' => $clientReference]);
+            $headers = self::idempotency($idempotencyKey) + ['Content-Type' => $form['contentType']];
+            $response = $this->transport->send('POST', '/api/slips/lookup', [], $form['body'], $headers);
+
+            return SlipCheck::fromArray(Transport::decode($response), self::pendingRetryAfter($response));
+        }
+
+        if (trim($slip) === '') {
+            throw new \InvalidArgumentException('Pass the QR text of the slip, or an Upload of its image.');
+        }
+        $body = ['qr' => $slip];
         if ($clientReference !== null) {
             $body['client_reference'] = $clientReference;
         }
         [$data, $response] = $this->transport->json('POST', '/api/slips/lookup', [], $body, self::idempotency($idempotencyKey));
 
         return SlipCheck::fromArray($data, self::pendingRetryAfter($response));
-    }
-
-    /**
-     * Looks a transfer up from a photo or screenshot of the slip. Checkslip reads
-     * the QR in the image and does not keep the image.
-     *
-     * JPEG, PNG or WebP, up to 10 MB and 50 megapixels. Other files get
-     * INVALID_FILE and use no credit.
-     *
-     * ```php
-     * $client->slips->lookupImage(Upload::fromPath('/tmp/slip.jpg'));
-     * ```
-     */
-    public function lookupImage(Upload $image, ?string $clientReference = null, ?string $idempotencyKey = null): SlipCheck
-    {
-        $form = Multipart::build($image, 'image', ['client_reference' => $clientReference]);
-        $headers = self::idempotency($idempotencyKey) + ['Content-Type' => $form['contentType']];
-        $response = $this->transport->send('POST', '/api/slips/lookup', [], $form['body'], $headers);
-
-        return SlipCheck::fromArray(Transport::decode($response), self::pendingRetryAfter($response));
     }
 
     /**
@@ -120,6 +126,34 @@ final class Slips extends AbstractResource
     }
 
     /**
+     * Every matching past lookup across all pages.
+     *
+     * @param list<Outcome|string>|null $outcome
+     * @param list<Outcome|string>|null $outcomeNot
+     * @param list<bool|string>|null $charged
+     * @param list<FreeReason|string>|null $freeReason
+     *
+     * @return \Generator<int, SlipCheckRecord>
+     */
+    public function listAll(
+        ?string $q = null,
+        ?string $transRef = null,
+        ?array $outcome = null,
+        ?array $outcomeNot = null,
+        ?string $senderBank = null,
+        ?string $apiKey = null,
+        ?string $after = null,
+        ?array $charged = null,
+        ?array $freeReason = null,
+        \DateTimeInterface|string|null $from = null,
+        \DateTimeInterface|string|null $to = null,
+        ?int $limit = null,
+        ?string $cursor = null,
+    ): \Generator {
+        return $this->list($q, $transRef, $outcome, $outcomeNot, $senderBank, $apiKey, $after, $charged, $freeReason, $from, $to, $limit, $cursor)->autoPaging();
+    }
+
+    /**
      * One past lookup by its request_id. Another account's id answers 404.
      */
     public function get(string $requestId): SlipCheckRecord
@@ -149,86 +183,6 @@ final class Slips extends AbstractResource
         ]);
 
         return SlipCounts::fromArray($data);
-    }
-
-    /**
-     * Starts a CSV export of the history with the same filters as {@see list()}.
-     * Up to 1,000,000 rows come back READY at once; more run as a job you poll
-     * with {@see getExport()}. The file holds payer and payee names: keep it safe.
-     *
-     * @param list<ExportColumn|string> $columns
-     * @param list<Outcome|string>|null $outcome
-     * @param list<Outcome|string>|null $outcomeNot
-     * @param list<bool|string>|null $charged
-     * @param list<FreeReason|string>|null $freeReason
-     * @param string|null $cursor The continue_cursor of an earlier, truncated export
-     */
-    public function createExport(
-        array $columns,
-        ?string $q = null,
-        ?string $transRef = null,
-        ?array $outcome = null,
-        ?array $outcomeNot = null,
-        ?string $senderBank = null,
-        ?string $apiKey = null,
-        ?array $charged = null,
-        ?array $freeReason = null,
-        \DateTimeInterface|string|null $from = null,
-        \DateTimeInterface|string|null $to = null,
-        ?string $cursor = null,
-    ): SlipExport {
-        if ($columns === []) {
-            throw new \InvalidArgumentException('Pick at least one column.');
-        }
-        $body = array_filter([
-            'columns' => Query::list($columns),
-            'q' => $q,
-            'trans_ref' => $transRef,
-            'outcome' => Query::list($outcome),
-            'outcome_not' => Query::list($outcomeNot),
-            'sender_bank' => $senderBank,
-            'api_key' => $apiKey,
-            'charged' => self::charged($charged),
-            'free_reason' => Query::list($freeReason),
-            'from' => Query::dateTime($from),
-            'to' => Query::dateTime($to),
-            'cursor' => $cursor,
-        ], static fn(mixed $v): bool => $v !== null);
-        [$data] = $this->transport->json('POST', '/api/slips/exports', [], $body);
-
-        return SlipExport::fromArray($data);
-    }
-
-    public function getExport(string $exportId): SlipExport
-    {
-        return SlipExport::fromArray($this->fetch(self::path('/api/slips/exports/%s', $exportId)));
-    }
-
-    /**
-     * Downloads one CSV part of a READY export. The body is a stream, so a large
-     * part does not have to fit in memory: copy it to a file in chunks.
-     *
-     * The part link is signed and short-lived; fetch a fresh one with
-     * {@see getExport()} once it has expired.
-     */
-    public function downloadExportPart(SlipExportPart|string $part): StreamInterface
-    {
-        $url = $part instanceof SlipExportPart ? $part->url : $part;
-        if (!str_starts_with($url, '/') && !str_starts_with($url, $this->transport->baseUrl() . '/')) {
-            throw new \InvalidArgumentException('The part URL does not belong to the configured base URL; refusing to send the API key there.');
-        }
-
-        return $this->transport->send('GET', $url)->getBody();
-    }
-
-    /**
-     * @param list<bool|string>|null $charged
-     *
-     * @return list<string>|null
-     */
-    private static function charged(?array $charged): ?array
-    {
-        return Query::list($charged === null ? null : array_map(static fn(bool|string $c): string => \is_bool($c) ? ($c ? 'true' : 'false') : $c, $charged));
     }
 
     private static function pendingRetryAfter(ResponseInterface $response): ?int

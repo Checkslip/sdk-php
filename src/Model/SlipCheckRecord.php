@@ -34,6 +34,11 @@ final class SlipCheckRecord
         /** True when the lookup used a credit. Null while it is not settled. */
         public readonly ?bool $charged = null,
         public readonly FreeReason|string|null $freeReason = null,
+        // TEMPORARY, remove when verify 0.61.0 is live (checkslip/pm h-mw94dkac8a0,
+        // 9 Nov 2026): verify took latency_ms, upstream_ms and checked_elsewhere
+        // out of the contract, but that has not reached main or deploy yet, so
+        // the public openapi.json still lists them. They stay out of the SDK
+        // until pm sends the regenerated spec, then this note goes away.
     ) {}
 
     /**

@@ -53,7 +53,7 @@ final class ErrorsTest extends TestCase
         $this->http->addResponse(self::problem($status, $code, [], ['detail' => 'More words']));
 
         try {
-            $this->client(maxRetries: 0)->billing->balance();
+            $this->client(maxRetries: 0)->billing->balance->get();
             self::fail('expected an exception');
         } catch (CheckslipException $e) {
             self::assertSame($class, $e::class);
@@ -81,7 +81,7 @@ final class ErrorsTest extends TestCase
         ]));
 
         try {
-            $this->client()->slips->lookup(qr: '');
+            $this->client()->slips->lookup(slip: 'not-a-slip-qr');
             self::fail('expected an exception');
         } catch (BadRequestException $e) {
             self::assertSame([
@@ -96,7 +96,7 @@ final class ErrorsTest extends TestCase
         $this->http->addResponse(new Response(502, ['Content-Type' => 'text/html'], '<html>Bad gateway</html>'));
 
         try {
-            $this->client(maxRetries: 0)->billing->balance();
+            $this->client(maxRetries: 0)->billing->balance->get();
             self::fail('expected an exception');
         } catch (ServerException $e) {
             self::assertSame(502, $e->status);
@@ -110,7 +110,7 @@ final class ErrorsTest extends TestCase
         $this->http->addResponse(new Response(200, ['Content-Type' => 'application/json'], '{not json'));
 
         $this->expectException(UnexpectedResponseException::class);
-        $this->client()->billing->balance();
+        $this->client()->billing->balance->get();
     }
 
     public function testMissingRequiredFieldThrows(): void
@@ -119,6 +119,6 @@ final class ErrorsTest extends TestCase
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage('"account_id"');
-        $this->client()->billing->balance();
+        $this->client()->billing->balance->get();
     }
 }

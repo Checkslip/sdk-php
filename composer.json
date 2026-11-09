@@ -25,12 +25,12 @@
     ],
     "support": {
         "docs": "https://checkslip.com/docs",
-        "issues": "https://github.com/checkslip/checkslip-php/issues",
-        "source": "https://github.com/checkslip/checkslip-php",
-        "security": "https://github.com/checkslip/checkslip-php/security/policy"
+        "issues": "https://github.com/Checkslip/sdk-php/issues",
+        "source": "https://github.com/Checkslip/sdk-php",
+        "security": "https://github.com/Checkslip/sdk-php/security/policy"
     },
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-json": "*",
         "php-http/discovery": "^1.19",
         "psr/http-client": "^1.0",

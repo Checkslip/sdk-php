@@ -21,7 +21,7 @@ final class RetryTest extends TestCase
         $this->http->addResponse(self::problem(429, 'RATE_LIMITED', ['Retry-After' => '3']));
         $this->http->addResponse(self::json(200, self::fixture('balance')));
 
-        $balance = $this->client()->billing->balance();
+        $balance = $this->client()->billing->balance->get();
 
         self::assertSame(1250, $balance->credits);
         self::assertSame([3.0], $this->sleeps);
@@ -45,7 +45,7 @@ final class RetryTest extends TestCase
         }
 
         try {
-            $this->client(maxRetries: 2)->billing->balance();
+            $this->client(maxRetries: 2)->billing->balance->get();
             self::fail('expected an exception');
         } catch (RateLimitException $e) {
             self::assertSame(2, $e->retryAfter);
@@ -61,7 +61,7 @@ final class RetryTest extends TestCase
 
         $this->expectException(RateLimitException::class);
         try {
-            $this->client()->billing->balance();
+            $this->client()->billing->balance->get();
         } finally {
             self::assertSame([], $this->sleeps);
         }
@@ -72,7 +72,7 @@ final class RetryTest extends TestCase
         $this->http->addResponse(self::problem(503, 'UNAVAILABLE'));
         $this->http->addResponse(self::json(200, self::fixture('lookup-found')));
 
-        $this->client()->slips->lookup(qr: 'abc');
+        $this->client()->slips->lookup(slip: 'abc');
 
         $requests = $this->http->getRequests();
         self::assertCount(2, $requests);
@@ -90,7 +90,7 @@ final class RetryTest extends TestCase
         $this->http->addException(new NetworkError(new Request('POST', '/')));
         $this->http->addResponse(self::json(200, self::fixture('lookup-found')));
 
-        $check = $this->client()->slips->lookup(qr: 'abc', idempotencyKey: 'k-1');
+        $check = $this->client()->slips->lookup(slip: 'abc', idempotencyKey: 'k-1');
 
         self::assertTrue($check->isFound());
         self::assertCount(2, $this->http->getRequests());
@@ -127,7 +127,7 @@ final class RetryTest extends TestCase
         }
 
         try {
-            $this->client()->billing->balance();
+            $this->client()->billing->balance->get();
             self::fail('expected an exception');
         } catch (ConnectionException $e) {
             self::assertNull($e->status);
@@ -142,7 +142,7 @@ final class RetryTest extends TestCase
         $this->http->addResponse(self::problem(409, 'IDEMPOTENCY_IN_FLIGHT'));
         $this->http->addResponse(self::json(200, self::fixture('lookup-found')));
 
-        $this->client()->slips->lookup(qr: 'abc');
+        $this->client()->slips->lookup(slip: 'abc');
 
         self::assertCount(2, $this->http->getRequests());
     }
@@ -164,7 +164,7 @@ final class RetryTest extends TestCase
         $this->http->addResponse(self::problem(503, 'UNAVAILABLE', ['Retry-After' => '1']));
 
         try {
-            $this->client(maxRetries: 0)->slips->lookup(qr: 'abc');
+            $this->client(maxRetries: 0)->slips->lookup(slip: 'abc');
             self::fail('expected an exception');
         } catch (ServiceUnavailableException $e) {
             self::assertSame(1, $e->retryAfter);
@@ -189,7 +189,7 @@ final class RetryTest extends TestCase
         $this->http->addResponse(self::problem(429, 'RATE_LIMITED', ['Retry-After' => $at]));
         $this->http->addResponse(self::json(200, self::fixture('balance')));
 
-        $this->client()->billing->balance();
+        $this->client()->billing->balance->get();
 
         self::assertCount(1, $this->sleeps);
         self::assertGreaterThanOrEqual(3.0, $this->sleeps[0]);

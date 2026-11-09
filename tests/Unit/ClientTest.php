@@ -32,7 +32,7 @@ final class ClientTest extends TestCase
     public function testSendsAuthAcceptAndUserAgent(): void
     {
         $this->http->addResponse(self::json(200, self::fixture('balance')));
-        $this->client()->billing->balance();
+        $this->client()->billing->balance->get();
 
         $r = $this->lastRequest();
         self::assertSame('GET', $r->getMethod());

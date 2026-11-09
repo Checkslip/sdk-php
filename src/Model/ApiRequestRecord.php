@@ -16,11 +16,12 @@ final class ApiRequestRecord
 {
     /**
      * @param array{qr_sha256?: string, trans_ref?: string}|null $fingerprint
-     * @param list<array{path: string, reason: string}> $redactions
      */
     public function __construct(
         public readonly string $requestId,
         public readonly \DateTimeImmutable $receivedAt,
+        /** How long this request took, from receiving it to answering it. */
+        public readonly int $latencyMs,
         public readonly Channel|string|null $channel,
         public readonly string $method,
         public readonly string $route,
@@ -34,7 +35,6 @@ final class ApiRequestRecord
         public readonly ?string $userAgent,
         public readonly ?string $outcomeCode,
         public readonly ?array $fingerprint,
-        public readonly array $redactions,
     ) {}
 
     /**
@@ -57,6 +57,7 @@ final class ApiRequestRecord
         return new self(
             Arr::str($d, 'request_id'),
             Arr::date($d, 'received_at'),
+            Arr::int($d, 'latency_ms'),
             Enums::ofNullable(Channel::class, Arr::strOrNull($d, 'channel')),
             Arr::str($d, 'method'),
             Arr::str($d, 'route'),
@@ -68,20 +69,7 @@ final class ApiRequestRecord
             Arr::strOrNull($d, 'user_agent'),
             Arr::strOrNull($d, 'outcome_code'),
             $fingerprint,
-            self::redactions($d),
         );
     }
 
-    /**
-     * @param array<string, mixed> $d
-     *
-     * @return list<array{path: string, reason: string}>
-     */
-    public static function redactions(array $d): array
-    {
-        return array_map(
-            static fn(array $r): array => ['path' => Arr::str($r, 'path'), 'reason' => Arr::str($r, 'reason')],
-            Arr::objects($d, 'redactions'),
-        );
-    }
 }

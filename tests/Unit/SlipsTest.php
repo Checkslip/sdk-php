@@ -26,7 +26,7 @@ final class SlipsTest extends TestCase
     {
         $this->http->addResponse(self::json(200, self::fixture('lookup-found')));
 
-        $check = $this->client()->slips->lookup(qr: '0033000600000101030690', clientReference: 'ORDER-10023');
+        $check = $this->client()->slips->lookup(slip: '0033000600000101030690', clientReference: 'ORDER-10023');
 
         $r = $this->lastRequest();
         self::assertSame('POST', $r->getMethod());
@@ -54,7 +54,7 @@ final class SlipsTest extends TestCase
     public function testLookupSendsAGeneratedIdempotencyKey(): void
     {
         $this->http->addResponse(self::json(200, self::fixture('lookup-found')));
-        $this->client()->slips->lookup(qr: 'abc');
+        $this->client()->slips->lookup(slip: 'abc');
 
         self::assertMatchesRegularExpression(self::UUID, $this->lastRequest()->getHeaderLine('Idempotency-Key'));
         self::assertSame(['qr' => 'abc'], self::body($this->lastRequest()));
@@ -63,7 +63,7 @@ final class SlipsTest extends TestCase
     public function testLookupUsesTheCallersIdempotencyKey(): void
     {
         $this->http->addResponse(self::json(200, self::fixture('lookup-found')));
-        $this->client()->slips->lookup(qr: 'abc', idempotencyKey: 'order-42-slip-1');
+        $this->client()->slips->lookup(slip: 'abc', idempotencyKey: 'order-42-slip-1');
 
         self::assertSame('order-42-slip-1', $this->lastRequest()->getHeaderLine('Idempotency-Key'));
     }
@@ -71,7 +71,7 @@ final class SlipsTest extends TestCase
     public function testBillPaymentReceiverHasNoBank(): void
     {
         $this->http->addResponse(self::json(200, self::fixture('lookup-found-bill-payment')));
-        $slip = $this->client()->slips->lookup(qr: 'abc')->slip;
+        $slip = $this->client()->slips->lookup(slip: 'abc')->slip;
 
         self::assertInstanceOf(Slip::class, $slip);
         self::assertSame(ReceiverKind::BillPayment, $slip->receiver->kind);
@@ -82,7 +82,7 @@ final class SlipsTest extends TestCase
     public function testDuplicateCarriesTheSummaryAndTheEarlierLookup(): void
     {
         $this->http->addResponse(self::json(200, self::fixture('lookup-duplicate')));
-        $check = $this->client()->slips->lookup(qr: 'abc');
+        $check = $this->client()->slips->lookup(slip: 'abc');
 
         self::assertTrue($check->isDuplicate());
         self::assertInstanceOf(SlipSummary::class, $check->slip);
@@ -100,7 +100,7 @@ final class SlipsTest extends TestCase
         ];
         $this->http->addResponse(self::json(202, $pending, ['Retry-After' => '30', 'Location' => '/api/slips/0192d4e0-7c1a-7b3e-9f00-1a2b3c4d5e72']));
 
-        $check = $this->client()->slips->lookup(qr: 'abc');
+        $check = $this->client()->slips->lookup(slip: 'abc');
 
         self::assertTrue($check->isPending());
         self::assertSame(30, $check->retryAfter);
@@ -112,7 +112,7 @@ final class SlipsTest extends TestCase
         $this->http->addResponse(self::problem(422, 'INVALID_QR'));
 
         try {
-            $this->client()->slips->lookup(qr: 'not a slip');
+            $this->client()->slips->lookup(slip: 'not a slip');
             self::fail('expected an exception');
         } catch (UnprocessableEntityException $e) {
             self::assertSame('INVALID_QR', $e->errorCode);
@@ -127,7 +127,7 @@ final class SlipsTest extends TestCase
         $this->http->addResponse(self::json(200, self::fixture('lookup-found')));
         $png = "\x89PNG\r\n\x1A\n" . str_repeat("\0", 32);
 
-        $this->client()->slips->lookupImage(Upload::fromString($png, 'slip "1".png'), clientReference: 'ORDER-7');
+        $this->client()->slips->lookup(Upload::fromString($png, 'slip "1".png'), clientReference: 'ORDER-7');
 
         $r = $this->lastRequest();
         self::assertMatchesRegularExpression('#^multipart/form-data; boundary=(checkslip-[0-9a-f]{32})$#', $r->getHeaderLine('Content-Type'));
@@ -215,15 +215,25 @@ final class SlipsTest extends TestCase
         self::assertNull($second->slip);
     }
 
-    public function testRetiredFieldsAreNotExposed(): void
+    public function testTheContractDecidesWhatIsExposed(): void
     {
+        // verify 0.61.0 takes these three out of the contract. It has not
+        // deployed yet, so pm asked for them to stay out of the SDK until the
+        // regenerated spec arrives (h-mw94dkac8a0, 9 Nov 2026).
         foreach (['checkedElsewhere', 'latencyMs', 'upstreamMs'] as $field) {
             self::assertFalse(property_exists(SlipCheck::class, $field), $field);
             self::assertFalse(property_exists(SlipCheckRecord::class, $field), $field);
         }
-        self::assertNotContains('latency_ms', array_column(ExportColumn::cases(), 'value'));
-        self::assertNotContains('upstream_ms', array_column(ExportColumn::cases(), 'value'));
-        self::assertNotContains('checked_elsewhere', array_column(ExportColumn::cases(), 'value'));
+        $columns = array_column(ExportColumn::cases(), 'value');
+        self::assertNotContains('latency_ms', $columns);
+        self::assertNotContains('upstream_ms', $columns);
+        self::assertNotContains('checked_elsewhere', $columns);
+
+        // These left the contract and must not come back.
+        foreach (['traceId', 'recordedBy', 'chain', 'build', 'sourceDomain'] as $field) {
+            self::assertFalse(property_exists(SlipCheck::class, $field), $field);
+            self::assertFalse(property_exists(SlipCheckRecord::class, $field), $field);
+        }
     }
 
     public function testGetEncodesThePathSegment(): void
@@ -249,12 +259,12 @@ final class SlipsTest extends TestCase
         $this->http->addResponse(new Response(200, ['Content-Type' => 'text/csv'], "\u{FEFF}request_id,outcome\n"));
         $client = $this->client();
 
-        $export = $client->slips->createExport(columns: [ExportColumn::RequestId, ExportColumn::Outcome], outcome: [Outcome::Found]);
+        $export = $client->slips->exports->create(columns: [ExportColumn::RequestId, ExportColumn::Outcome], outcome: [Outcome::Found]);
         self::assertSame(['columns' => ['request_id', 'outcome'], 'outcome' => ['FOUND']], self::body($this->lastRequest()));
         self::assertTrue($export->isReady());
         self::assertCount(1, $export->parts);
 
-        $csv = $client->slips->downloadExportPart($export->parts[0]);
+        $csv = $client->slips->exports->downloadPart($export->parts[0]);
         self::assertStringContainsString('request_id,outcome', (string) $csv);
         self::assertSame('sig=abc', $this->lastRequest()->getUri()->getQuery());
         self::assertSame('Bearer csk_test_key', $this->lastRequest()->getHeaderLine('Authorization'));
@@ -263,12 +273,12 @@ final class SlipsTest extends TestCase
     public function testDownloadRefusesAnotherHost(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->client()->slips->downloadExportPart('https://evil.example.com/api/slips/exports/x/parts/1?sig=a');
+        $this->client()->slips->exports->downloadPart('https://evil.example.com/api/slips/exports/x/parts/1?sig=a');
     }
 
     public function testExportNeedsAColumn(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->client()->slips->createExport(columns: []);
+        $this->client()->slips->exports->create(columns: []);
     }
 }
