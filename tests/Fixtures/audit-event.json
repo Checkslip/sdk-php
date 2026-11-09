@@ -1,0 +1,39 @@
+{
+  "event_id": "0192d4e0-0000-7000-8000-0000000000a1",
+  "source_domain": "principal",
+  "category": "ACCESS",
+  "outcome": "SUCCESS",
+  "occurred_at": "2026-11-01T10:00:00Z",
+  "causation_id": null,
+  "request_id": "0192d4e0-0000-7000-8000-0000000000b1",
+  "actor": {
+    "type": "USER",
+    "id": "0192d4e0-0000-7000-8000-0000000000c1"
+  },
+  "channel": "DASHBOARD",
+  "action": "api_key.created",
+  "target": {
+    "type": "api_key",
+    "id": "a1B2c3D4e5F6"
+  },
+  "before": null,
+  "after": {
+    "name": "shop"
+  },
+  "reason": null,
+  "redactions": [
+    {
+      "path": "/after/note",
+      "reason": "free_text"
+    }
+  ],
+  "build": "cccccccccccccccccccccccccccccccccccccccc",
+  "chain": {
+    "stream": "AUDIT_EVENTS",
+    "day": "2026-11-01",
+    "lane": 0,
+    "seq": 1,
+    "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "row_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  }
+}

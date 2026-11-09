@@ -34,7 +34,7 @@ abstract class AbstractResource
         return new Page(
             $items,
             Arr::strOrNull($data, 'next_cursor'),
-            fn (string $cursor): Page => $this->page($path, ['cursor' => $cursor] + $query, $map),
+            fn(string $cursor): Page => $this->page($path, ['cursor' => $cursor] + $query, $map),
         );
     }
 
@@ -56,6 +56,6 @@ abstract class AbstractResource
 
     protected static function path(string $format, string|int ...$ids): string
     {
-        return vsprintf($format, array_map(static fn (string|int $id): string => rawurlencode((string) $id), $ids));
+        return vsprintf($format, array_map(static fn(string|int $id): string => rawurlencode((string) $id), $ids));
     }
 }

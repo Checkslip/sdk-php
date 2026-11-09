@@ -1,0 +1,10 @@
+{
+  "account_id": "0192d4e0-0000-7000-8000-000000000001",
+  "credits": 1250,
+  "low": false,
+  "threshold": 40,
+  "threshold_basis": "AVG_7_DAYS",
+  "expires_at": "2027-10-29T00:00:00+07:00",
+  "updated_at": "2026-11-08T09:00:00+07:00",
+  "last_entry_id": null
+}

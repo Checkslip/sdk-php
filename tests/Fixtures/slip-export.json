@@ -1,0 +1,25 @@
+{
+  "export_id": "0192d4e0-0000-7000-8000-0000000000f1",
+  "state": "READY",
+  "mode": "DIRECT",
+  "created_at": "2026-11-08T09:00:00+07:00",
+  "request": {
+    "columns": [
+      "request_id",
+      "outcome"
+    ]
+  },
+  "rows": 2,
+  "truncated": false,
+  "truncated_after": null,
+  "continue_cursor": null,
+  "expires_at": "2026-11-09T09:00:00+07:00",
+  "parts": [
+    {
+      "part": 1,
+      "rows": 2,
+      "url": "https://api.checkslip.com/api/slips/exports/0192d4e0-0000-7000-8000-0000000000f1/parts/1?sig=abc",
+      "url_expires_at": "2026-11-08T09:15:00+07:00"
+    }
+  ]
+}

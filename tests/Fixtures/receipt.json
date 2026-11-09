@@ -1,0 +1,43 @@
+{
+  "seller_ready": true,
+  "id": "0192d4e0-0000-7000-8000-0000000000d2",
+  "receipt_no": "RC-202611-0001",
+  "order_id": "0192d4e0-0000-7000-8000-0000000000d1",
+  "issued_at": "2026-11-01T10:01:00Z",
+  "seller": {
+    "name": "บริษัท โฮโลแกรม จำกัด",
+    "tax_id": "0105500000000",
+    "branch": "สำนักงานใหญ่"
+  },
+  "buyer": {
+    "buyer_type": "COMPANY",
+    "name": "ร้านตัวอย่าง",
+    "tax_id": "0105511111111"
+  },
+  "lines": [
+    {
+      "description": "100 เครดิต",
+      "quantity": 1,
+      "amount": {
+        "satang": 19900,
+        "currency": "THB"
+      }
+    }
+  ],
+  "vat": {
+    "rate_bp": 700,
+    "base": {
+      "satang": 18598,
+      "currency": "THB"
+    },
+    "amount": {
+      "satang": 1302,
+      "currency": "THB"
+    }
+  },
+  "total": {
+    "satang": 19900,
+    "currency": "THB"
+  },
+  "payment_method": "PROMPTPAY"
+}

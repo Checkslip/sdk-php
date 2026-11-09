@@ -1,0 +1,53 @@
+{
+  "interval": "DAY",
+  "as_of": "2026-11-08T09:00:00+07:00",
+  "from": "2026-11-01",
+  "to": "2026-11-02",
+  "timezone": "Asia/Bangkok",
+  "buckets": [
+    {
+      "start": "2026-11-01",
+      "checks": 10,
+      "charged": 7,
+      "free_not_found": 1,
+      "free_duplicate": 1,
+      "free_unavailable": 0,
+      "free_invalid_qr": 1,
+      "free_invalid_file": 0,
+      "free_qr_tampered": 0,
+      "free_too_old": 0,
+      "free_no_credit": 0,
+      "free_hold_expired": 0,
+      "free_system_error": 0
+    },
+    {
+      "start": "2026-11-02",
+      "checks": 10,
+      "charged": 7,
+      "free_not_found": 1,
+      "free_duplicate": 1,
+      "free_unavailable": 0,
+      "free_invalid_qr": 1,
+      "free_invalid_file": 0,
+      "free_qr_tampered": 0,
+      "free_too_old": 0,
+      "free_no_credit": 0,
+      "free_hold_expired": 0,
+      "free_system_error": 0
+    }
+  ],
+  "totals": {
+    "checks": 20,
+    "charged": 14,
+    "free_not_found": 2,
+    "free_duplicate": 2,
+    "free_unavailable": 0,
+    "free_invalid_qr": 2,
+    "free_invalid_file": 0,
+    "free_qr_tampered": 0,
+    "free_too_old": 0,
+    "free_no_credit": 0,
+    "free_hold_expired": 0,
+    "free_system_error": 0
+  }
+}

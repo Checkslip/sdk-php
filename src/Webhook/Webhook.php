@@ -50,7 +50,7 @@ final class Webhook
             throw new \InvalidArgumentException('Give at least one webhook secret.');
         }
         $this->keys = array_map(self::decodeSecret(...), $secrets);
-        $this->clock = $clock ?? static fn (): int => time();
+        $this->clock = $clock ?? static fn(): int => time();
     }
 
     /**
@@ -130,7 +130,7 @@ final class Webhook
     public function sign(string $id, int $timestamp, string $payload): string
     {
         return implode(' ', array_map(
-            static fn (string $key): string => 'v1,' . base64_encode(hash_hmac('sha256', "{$id}.{$timestamp}.{$payload}", $key, true)),
+            static fn(string $key): string => 'v1,' . base64_encode(hash_hmac('sha256', "{$id}.{$timestamp}.{$payload}", $key, true)),
             $this->keys,
         ));
     }

@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "code": "KBANK",
+      "bot_code": "004",
+      "name_th": "ธนาคารกสิกรไทย",
+      "name_en": "Kasikornbank",
+      "supported_since": "2026-10-01",
+      "landing_page": true,
+      "lookback_days": 30
+    },
+    {
+      "code": "BAY",
+      "bot_code": "025",
+      "name_th": "ธนาคารกรุงศรีอยุธยา",
+      "name_en": "Bank of Ayudhya",
+      "supported_since": "2026-10-15",
+      "landing_page": false,
+      "lookback_days": 60
+    }
+  ]
+}

@@ -80,7 +80,7 @@ final class ApiRequestRecord
     public static function redactions(array $d): array
     {
         return array_map(
-            static fn (array $r): array => ['path' => Arr::str($r, 'path'), 'reason' => Arr::str($r, 'reason')],
+            static fn(array $r): array => ['path' => Arr::str($r, 'path'), 'reason' => Arr::str($r, 'reason')],
             Arr::objects($d, 'redactions'),
         );
     }

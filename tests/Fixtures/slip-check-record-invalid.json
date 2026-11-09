@@ -1,0 +1,11 @@
+{
+  "request_id": "0192d4e0-7c1a-7b3e-9f00-1a2b3c4d5e71",
+  "outcome": "INVALID_QR",
+  "checked_at": "2026-10-29T10:42:00+07:00",
+  "api_key_id": null,
+  "status": 422,
+  "channel": "DASHBOARD",
+  "charge_confirmed": true,
+  "charged": false,
+  "free_reason": "INVALID_QR"
+}

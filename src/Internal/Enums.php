@@ -46,7 +46,7 @@ final class Enums
      */
     public static function list(string $enum, array $values): array
     {
-        return array_map(static fn (string $v): \BackedEnum|string => self::of($enum, $v), $values);
+        return array_map(static fn(string $v): \BackedEnum|string => self::of($enum, $v), $values);
     }
 
     public static function value(\BackedEnum|string $v): string

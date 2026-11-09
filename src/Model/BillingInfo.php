@@ -50,6 +50,6 @@ final class BillingInfo
             'branch' => $this->branch,
             'address' => $this->address,
             'email' => $this->email,
-        ], static fn (?string $v): bool => $v !== null);
+        ], static fn(?string $v): bool => $v !== null);
     }
 }

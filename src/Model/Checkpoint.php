@@ -41,7 +41,7 @@ final class Checkpoint
             Arr::date($d, 'day'),
             Arr::bool($d, 'sealed'),
             array_map(
-                static fn (array $l): array => ['lane' => Arr::int($l, 'lane'), 'seq' => Arr::int($l, 'seq'), 'row_hash' => Arr::str($l, 'row_hash')],
+                static fn(array $l): array => ['lane' => Arr::int($l, 'lane'), 'seq' => Arr::int($l, 'seq'), 'row_hash' => Arr::str($l, 'row_hash')],
                 Arr::objects($d, 'lanes'),
             ),
             Arr::date($d, 'created_at'),

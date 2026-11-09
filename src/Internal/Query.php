@@ -86,7 +86,7 @@ final class Query
      */
     private static function strings(array $values): array
     {
-        return array_map(static fn (\BackedEnum|string $v): string => $v instanceof \BackedEnum ? (string) $v->value : $v, $values);
+        return array_map(static fn(\BackedEnum|string $v): string => $v instanceof \BackedEnum ? (string) $v->value : $v, $values);
     }
 
     private static function scalar(mixed $v): string

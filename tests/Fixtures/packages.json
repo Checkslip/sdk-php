@@ -1,0 +1,23 @@
+{
+  "checkout_open": true,
+  "prices_include_vat": true,
+  "items": [
+    {
+      "code": "p100",
+      "name_th": "100 เครดิต",
+      "name_en": "100 credits",
+      "price": {
+        "satang": 19900,
+        "currency": "THB"
+      },
+      "price_per_credit": {
+        "satang": 199,
+        "currency": "THB"
+      },
+      "credits": 100,
+      "validity_days": 365,
+      "for_sale": true,
+      "sort": 1
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "bucket": "HOUR",
+  "as_of": "2026-11-08T09:00:00+07:00",
+  "filters_applied": [
+    "from",
+    "to",
+    "outcome"
+  ],
+  "filters_ignored": [],
+  "series": [
+    {
+      "start": "2026-11-08T08:00:00+07:00",
+      "counts": {
+        "FOUND": 12,
+        "NOT_FOUND": 1
+      }
+    }
+  ]
+}

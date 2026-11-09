@@ -1,0 +1,18 @@
+{
+  "id": "0192d4e0-0000-7000-8000-0000000000d1",
+  "status": "PAID",
+  "package_code": "p100",
+  "package_name_th": "100 เครดิต",
+  "credits": 100,
+  "amount": {
+    "satang": 19900,
+    "currency": "THB"
+  },
+  "payment_method": "PROMPTPAY",
+  "receipt_id": "0192d4e0-0000-7000-8000-0000000000d2",
+  "created_at": "2026-11-01T10:00:00Z",
+  "paid_at": "2026-11-01T10:01:00Z",
+  "cancelled_at": null,
+  "confirming": false,
+  "review_reason": null
+}

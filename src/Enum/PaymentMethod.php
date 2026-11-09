@@ -10,5 +10,5 @@ namespace Checkslip\Enum;
 enum PaymentMethod: string
 {
     case Card = 'CARD';
-    case Promptpay = 'PROMPTPAY';
+    case PromptPay = 'PROMPTPAY';
 }

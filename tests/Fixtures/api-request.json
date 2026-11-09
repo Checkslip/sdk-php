@@ -1,0 +1,32 @@
+{
+  "request_id": "0192d4e0-0000-7000-8000-0000000000b1",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "received_at": "2026-11-01T10:00:00Z",
+  "latency_ms": 812,
+  "upstream_ms": 640,
+  "channel": "API",
+  "method": "POST",
+  "route": "/api/slips/lookup",
+  "http_status": 200,
+  "recorded_by": "gateway",
+  "api_key_id": "a1B2c3D4e5F6",
+  "user_id": null,
+  "client_ip_prefix": "203.0.113.0/24",
+  "client_ip_hmac": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "user_agent": "checkslip-php/0.1.0",
+  "outcome_code": "FOUND",
+  "fingerprint": {
+    "qr_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "trans_ref": "630210534087"
+  },
+  "redactions": null,
+  "build": "cccccccccccccccccccccccccccccccccccccccc",
+  "chain": {
+    "stream": "API_REQUESTS",
+    "day": "2026-11-01",
+    "lane": 0,
+    "seq": 1,
+    "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "row_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  }
+}

@@ -110,7 +110,7 @@ final class Slips extends AbstractResource
             'sender_bank' => $senderBank,
             'api_key' => $apiKey,
             'after' => $after,
-            'charged' => $charged === null ? null : Query::list(array_map(static fn (bool|string $c): string => \is_bool($c) ? ($c ? 'true' : 'false') : $c, $charged)),
+            'charged' => self::charged($charged),
             'free_reason' => Query::list($freeReason),
             'from' => Query::dateTime($from),
             'to' => Query::dateTime($to),
@@ -188,12 +188,12 @@ final class Slips extends AbstractResource
             'outcome_not' => Query::list($outcomeNot),
             'sender_bank' => $senderBank,
             'api_key' => $apiKey,
-            'charged' => $charged === null ? null : array_map(static fn (bool|string $c): string => \is_bool($c) ? ($c ? 'true' : 'false') : $c, $charged),
+            'charged' => self::charged($charged),
             'free_reason' => Query::list($freeReason),
             'from' => Query::dateTime($from),
             'to' => Query::dateTime($to),
             'cursor' => $cursor,
-        ], static fn (mixed $v): bool => $v !== null);
+        ], static fn(mixed $v): bool => $v !== null);
         [$data] = $this->transport->json('POST', '/api/slips/exports', [], $body);
 
         return SlipExport::fromArray($data);
@@ -219,6 +219,16 @@ final class Slips extends AbstractResource
         }
 
         return $this->transport->send('GET', $url)->getBody();
+    }
+
+    /**
+     * @param list<bool|string>|null $charged
+     *
+     * @return list<string>|null
+     */
+    private static function charged(?array $charged): ?array
+    {
+        return Query::list($charged === null ? null : array_map(static fn(bool|string $c): string => \is_bool($c) ? ($c ? 'true' : 'false') : $c, $charged));
     }
 
     private static function pendingRetryAfter(ResponseInterface $response): ?int

@@ -57,7 +57,8 @@ final class Client
      * @param (\Closure(float): void)|null $sleep Replaces the wait between retries. Meant for tests.
      */
     public function __construct(
-        #[\SensitiveParameter] string $apiKey,
+        #[\SensitiveParameter]
+        string $apiKey,
         string $baseUrl = self::DEFAULT_BASE_URL,
         float $timeout = 30.0,
         int $maxRetries = 2,
