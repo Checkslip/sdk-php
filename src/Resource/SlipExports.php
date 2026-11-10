@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Checkslip\Resource;
 
+use Checkslip\Enum\CustomerFreeReason;
 use Checkslip\Enum\ExportColumn;
-use Checkslip\Enum\FreeReason;
 use Checkslip\Enum\Outcome;
 use Checkslip\Internal\Query;
 use Checkslip\Model\SlipExport;
@@ -26,7 +26,7 @@ final class SlipExports extends AbstractResource
      * @param list<Outcome|string>|null $outcome
      * @param list<Outcome|string>|null $outcomeNot
      * @param list<bool|string>|null $charged
-     * @param list<FreeReason|string>|null $freeReason
+     * @param list<CustomerFreeReason|string>|null $freeReason The nine reasons a customer can receive
      * @param string|null $cursor The continue_cursor of an earlier, truncated export
      */
     public function create(
