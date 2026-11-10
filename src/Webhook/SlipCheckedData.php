@@ -14,7 +14,7 @@ use Checkslip\Model\SlipSummary;
 
 /**
  * The data of a slip.checked message: a lookup finished, from the API, the
- * dashboard or the assistant.
+ * web app or the assistant.
  */
 final class SlipCheckedData
 {
