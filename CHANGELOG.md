@@ -4,6 +4,24 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.4.0](https://github.com/Checkslip/sdk-php/compare/v0.3.1...v0.4.0) (2026-11-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* The $freeReason filter on Slips::list(), Slips::listAll() and SlipExports::create() takes CustomerFreeReason, the nine reasons a customer can receive, instead of FreeReason. PENDING, NO_CREDIT and HOLD_EXPIRED are not among them, so phpstan and psalm flag it; at runtime the value is still sent, and the API accepts only the nine. The reason a lookup reports back is unchanged: still FreeReason|string. Counts still take the filter and still ignore it, so nothing changes there.
+* UsageCounts no longer has $freeNoCredit or $freeHoldExpired (free_no_credit and free_hold_expired in the API response). Both had been returning 0 on every account before this release, and the API has now removed them from UsageCounts. Code that reads either one gets a warning and null instead of a number, and nothing stops the program, so delete those reads before you upgrade. phpstan reports it as an undefined property. A lookup that was not charged, with no reason given, counts in $freeOther.
+
+### Features
+
+* the free_reason filter takes the reasons a customer receives ([f41f5f9](https://github.com/Checkslip/sdk-php/commit/f41f5f9405a011d93ebd53ac544784ebb3b90e27))
+* UsageCounts no longer has $freeNoCredit or $freeHoldExpired ([f772ea1](https://github.com/Checkslip/sdk-php/commit/f772ea1db69ad501f0e831c6114c931c3edd4feb))
+
+
+### Bug Fixes
+
+* **docs:** the quick start narrows to Slip before reading the transfer ([7561eaf](https://github.com/Checkslip/sdk-php/commit/7561eafe7a48dfeb9a026318f5c05dd6705e8221))
+
 ## [0.3.1](https://github.com/Checkslip/sdk-php/compare/v0.3.0...v0.3.1) (2026-11-10)
 
 
