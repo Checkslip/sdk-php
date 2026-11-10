@@ -4,7 +4,7 @@
 
 ไคลเอนต์ PHP ทางการของ [Checkslip API](https://checkslip.com/docs)
 
-Checkslip ถามรายการโอนกับธนาคารต้นทางให้ คุณส่งข้อความใน QR code บนสลิป หรือรูปสลิปมา แล้ว Checkslip คืนข้อมูลที่ธนาคารมีสำหรับรายการนั้น ได้แก่ จำนวนเงิน เวลา ผู้โอนและผู้รับ ส่วนการตัดสินใจว่าจะรับเงินนั้นหรือไม่เป็นของคุณ โดยเทียบกับออร์เดอร์ของคุณเอง
+Checkslip ดึงข้อมูลรายการโอนเงินของธนาคารไทยจากสลิป คุณส่งข้อความใน QR code บนสลิป หรือรูปสลิปมา แล้ว Checkslip คืนข้อมูลที่ธนาคารมีสำหรับรายการนั้น ได้แก่ จำนวนเงิน เวลา ผู้โอนและผู้รับ ส่วนการตัดสินใจว่าจะรับเงินนั้นหรือไม่เป็นของคุณ โดยเทียบกับออร์เดอร์ของคุณเอง
 
 ไลบรารีนี้ต้องใช้ PHP 8.2 ขึ้นไป และไคลเอนต์ HTTP ที่เป็น [PSR-18](https://www.php-fig.org/psr/psr-18/) ตัวใดก็ได้
 
@@ -24,15 +24,16 @@ composer require checkslip/sdk guzzlehttp/guzzle
 
 ## เริ่มใช้งาน
 
-ออก API key ใน dashboard ของ Checkslip แล้วเก็บไว้ที่ฝั่งเซิร์ฟเวอร์
+ออก API key ในเว็บแอปของ Checkslip แล้วเก็บไว้ที่ฝั่งเซิร์ฟเวอร์
 
 ```php
 use Checkslip\Client;
+use Checkslip\Model\Slip;
 
 $checkslip = new Client(apiKey: getenv('CHECKSLIP_API_KEY'));
 ```
 
-### ค้นหาจากข้อความ QR บนสลิป
+### ดึงข้อมูลจากข้อความ QR บนสลิป
 
 อ่าน QR code บนสลิปด้วยตัวอ่าน QR อะไรก็ได้ แล้วส่งข้อความที่ได้มา
 
@@ -42,7 +43,7 @@ $check = $checkslip->slips->lookup(
     clientReference: 'ORDER-10023', // ไม่บังคับ เป็น id ของคุณเอง
 );
 
-if ($check->isFound()) {
+if ($check->isFound() && $check->slip instanceof Slip) {
     echo $check->slip->amount->toBaht(), " บาท\n";
     echo 'จาก ', $check->slip->sender->nameTh, ' ธนาคาร ', $check->slip->sender->bank->code, "\n";
     echo 'ถึง ', $check->slip->receiver->nameTh, ' ', $check->slip->receiver->account, "\n";
@@ -51,7 +52,7 @@ if ($check->isFound()) {
 
 จำนวนเงินคืนมาเป็นสตางค์ (100 สตางค์ = 1 บาท) ใช้ `toBaht()` จัดรูปแบบได้ เลขบัญชีคืนมาเฉพาะ 4 ตัวท้าย
 
-### ค้นหาจากรูปสลิป
+### ดึงข้อมูลจากรูปสลิป
 
 ส่ง `Upload` แทนข้อความ QR รับไฟล์ JPEG, PNG และ WebP ขนาดไม่เกิน 10 MB Checkslip จะอ่าน QR จากรูปให้ และไม่เก็บรูปไว้
 
@@ -79,7 +80,7 @@ $check = $checkslip->slips->lookup(
 | ----------- | ------------------------------------------------------------------------------------------ | --------- |
 | `FOUND`     | ธนาคารคืนรายการโอนมา ข้อมูลอยู่ใน `$check->slip`                                              | 1         |
 | `NOT_FOUND` | ธนาคารไม่มีรายการโอนที่อ้างอิงนี้                                                                | 0         |
-| `DUPLICATE` | บัญชีนี้เคยค้นรายการนี้แล้ว `$check->duplicateOf` ชี้ไปที่ครั้งก่อน                                   | 0         |
+| `DUPLICATE` | บัญชีนี้เคยดึงข้อมูลรายการนี้แล้ว `$check->duplicateOf` ชี้ไปที่ครั้งก่อน                                   | 0         |
 | `PENDING`   | ธนาคารยังไม่ตอบ Checkslip จะถามต่อให้ และส่ง webhook `slip.checked` เมื่อได้ผล ส่วน `$check->retryAfter` บอกว่าควรรออีกกี่วินาทีก่อนอ่านซ้ำด้วย `slips->get()` | 0 |
 
 ทั้งหมดนี้เป็นผลลัพธ์ปกติ SDK จึงคืนค่ากลับมา ส่วนปัญหาที่ตัวคำขอเอง เช่น QR ที่อ่านไม่ออก จะโยนเป็น exception
@@ -168,7 +169,7 @@ while ($page = $page->nextPage()) {
 
 ## Webhooks
 
-Checkslip ส่งข้อความ `slip.checked` ไปที่ endpoint ของคุณเมื่อการค้นหาเสร็จ รวมถึงรายการที่เคยเป็น `PENDING` ข้อความถูกเซ็นด้วยมาตรฐาน [Standard Webhooks](https://www.standardwebhooks.com) ให้ตรวจลายเซ็นก่อนเชื่อข้อความทุกครั้ง
+Checkslip ส่งข้อความ `slip.checked` ไปที่ endpoint ของคุณเมื่อการดึงข้อมูลสลิปเสร็จ รวมถึงรายการที่เคยเป็น `PENDING` ข้อความถูกเซ็นด้วยมาตรฐาน [Standard Webhooks](https://www.standardwebhooks.com) ให้ตรวจลายเซ็นก่อนเชื่อข้อความทุกครั้ง
 
 ```php
 use Checkslip\Webhook\Webhook;
@@ -217,7 +218,7 @@ $checkslip = new Client(
     baseUrl: 'https://api.checkslip.com',   // ค่าเริ่มต้น
     maxRetries: 2,                          // ค่าเริ่มต้น
     timeout: 30.0,                          // วินาทีต่อหนึ่งครั้ง ใช้กับไคลเอนต์ Guzzle และ Symfony
-    httpClient: $myPsr18Client,             // ค่าเริ่มต้น: ค้นหาให้เอง
+    httpClient: $myPsr18Client,             // ค่าเริ่มต้น: หาไคลเอนต์ PSR-18 ที่ติดตั้งไว้ให้เอง
 );
 ```
 

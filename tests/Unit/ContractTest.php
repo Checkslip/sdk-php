@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Checkslip\Tests\Unit;
 
+use Checkslip\Enum\CustomerFreeReason;
 use Checkslip\Enum\FreeReason;
 use Checkslip\Enum\Outcome;
 use Checkslip\Model\ApiRequestRecord;
@@ -185,11 +186,34 @@ final class ContractTest extends TestCase
     }
 
     /**
-     * The API added free_other, stopped counting free_no_credit and
-     * free_hold_expired, and will drop those two fields. The SDK and the API
-     * are deployed separately, so both shapes have to parse.
+     * The API closed the free_reason filter to the nine reasons a customer
+     * can receive, so the client offers CustomerFreeReason for it and keeps
+     * the wider FreeReason for what the API sends back.
      */
-    public function testUsageCountsParseWithOrWithoutTheDeprecatedFields(): void
+    public function testTheFreeReasonFilterTakesTheReasonsACustomerReceives(): void
+    {
+        $this->http->addResponse(self::json(200, ['items' => [], 'next_cursor' => null]));
+        $this->client()->slips->list(
+            freeReason: [CustomerFreeReason::Duplicate, CustomerFreeReason::TooOld],
+        );
+
+        $query = $this->lastRequest()->getUri()->getQuery();
+        self::assertStringContainsString('free_reason=DUPLICATE', $query);
+        self::assertStringContainsString('free_reason=TOO_OLD', $query);
+
+        // The three values FreeReason carries on top of these (PENDING,
+        // NO_CREDIT, HOLD_EXPIRED) are not filterable, which is the point of
+        // the narrower type.
+        self::assertCount(9, CustomerFreeReason::cases());
+        self::assertSame('OTHER', CustomerFreeReason::Other->value);
+    }
+
+    /**
+     * The API has dropped free_no_credit and free_hold_expired, so UsageCounts
+     * no longer carries them. The SDK and the API are deployed separately, so
+     * an answer that still sends both has to parse without failing.
+     */
+    public function testUsageCountsParseWithOrWithoutTheDroppedFields(): void
     {
         $common = [
             'checks' => 12,
@@ -204,15 +228,14 @@ final class ContractTest extends TestCase
             'free_system_error' => 0,
         ];
 
+        // An older deployment still sends the two dropped counts: they are
+        // ignored rather than causing a failure.
         $before = UsageCounts::fromArray($common + ['free_no_credit' => 3, 'free_hold_expired' => 2]);
-        self::assertSame(3, $before->freeNoCredit);
-        self::assertSame(2, $before->freeHoldExpired);
+        self::assertSame(12, $before->checks);
         self::assertSame(0, $before->freeOther, 'a server without the field counts nothing there');
 
         $after = UsageCounts::fromArray($common + ['free_other' => 5]);
         self::assertSame(5, $after->freeOther);
-        self::assertSame(0, $after->freeNoCredit);
-        self::assertSame(0, $after->freeHoldExpired);
 
         self::assertSame('OTHER', FreeReason::Other->value);
         self::assertSame(FreeReason::Other, FreeReason::tryFrom('OTHER'));
