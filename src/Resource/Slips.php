@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Checkslip\Resource;
 
 use Checkslip\Enum\CountBucket;
-use Checkslip\Enum\FreeReason;
+use Checkslip\Enum\CustomerFreeReason;
 use Checkslip\Enum\Outcome;
 use Checkslip\Internal\Multipart;
 use Checkslip\Internal\Query;
@@ -88,7 +88,7 @@ final class Slips extends AbstractResource
      * @param string|null $apiKey The 12-character id of an API key
      * @param string|null $after Only lookups after this request_id
      * @param list<bool|string>|null $charged true, false and/or "unsettled"
-     * @param list<FreeReason|string>|null $freeReason
+     * @param list<CustomerFreeReason|string>|null $freeReason The nine reasons a customer can receive
      * @param int|null $limit 1 to 100, default 20
      *
      * @return Page<SlipCheckRecord>
@@ -131,7 +131,7 @@ final class Slips extends AbstractResource
      * @param list<Outcome|string>|null $outcome
      * @param list<Outcome|string>|null $outcomeNot
      * @param list<bool|string>|null $charged
-     * @param list<FreeReason|string>|null $freeReason
+     * @param list<CustomerFreeReason|string>|null $freeReason The nine reasons a customer can receive
      *
      * @return \Generator<int, SlipCheckRecord>
      */
