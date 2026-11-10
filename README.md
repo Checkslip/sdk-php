@@ -24,10 +24,11 @@ The client finds an installed client and factories through `php-http/discovery`,
 
 ## Quick start
 
-Create an API key in the Checkslip dashboard and keep it on your server.
+Create an API key in the Checkslip web app and keep it on your server.
 
 ```php
 use Checkslip\Client;
+use Checkslip\Model\Slip;
 
 $checkslip = new Client(apiKey: getenv('CHECKSLIP_API_KEY'));
 ```
@@ -42,7 +43,7 @@ $check = $checkslip->slips->lookup(
     clientReference: 'ORDER-10023', // optional, your own id
 );
 
-if ($check->isFound()) {
+if ($check->isFound() && $check->slip instanceof Slip) {
     echo $check->slip->amount->toBaht(), " THB\n";
     echo 'from ', $check->slip->sender->nameEn, ' at ', $check->slip->sender->bank->code, "\n";
     echo 'to ', $check->slip->receiver->nameEn, ' ', $check->slip->receiver->account, "\n";

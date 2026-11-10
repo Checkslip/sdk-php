@@ -24,10 +24,11 @@ composer require checkslip/sdk guzzlehttp/guzzle
 
 ## เริ่มใช้งาน
 
-ออก API key ใน dashboard ของ Checkslip แล้วเก็บไว้ที่ฝั่งเซิร์ฟเวอร์
+ออก API key ในเว็บแอปของ Checkslip แล้วเก็บไว้ที่ฝั่งเซิร์ฟเวอร์
 
 ```php
 use Checkslip\Client;
+use Checkslip\Model\Slip;
 
 $checkslip = new Client(apiKey: getenv('CHECKSLIP_API_KEY'));
 ```
@@ -42,7 +43,7 @@ $check = $checkslip->slips->lookup(
     clientReference: 'ORDER-10023', // ไม่บังคับ เป็น id ของคุณเอง
 );
 
-if ($check->isFound()) {
+if ($check->isFound() && $check->slip instanceof Slip) {
     echo $check->slip->amount->toBaht(), " บาท\n";
     echo 'จาก ', $check->slip->sender->nameTh, ' ธนาคาร ', $check->slip->sender->bank->code, "\n";
     echo 'ถึง ', $check->slip->receiver->nameTh, ' ', $check->slip->receiver->account, "\n";
