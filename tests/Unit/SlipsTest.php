@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Checkslip\Tests\Unit;
 
+use Checkslip\Enum\CustomerFreeReason;
 use Checkslip\Enum\ExportColumn;
 use Checkslip\Enum\FreeReason;
 use Checkslip\Enum\Outcome;
@@ -189,7 +190,7 @@ final class SlipsTest extends TestCase
         $page = $this->client()->slips->list(
             outcome: [Outcome::Found, 'NOT_FOUND'],
             charged: [true, 'unsettled'],
-            freeReason: [FreeReason::NotFound, FreeReason::Duplicate],
+            freeReason: [CustomerFreeReason::NotFound, CustomerFreeReason::Duplicate],
             from: new \DateTimeImmutable('2026-11-01T00:00:00+07:00'),
             limit: 50,
         );
