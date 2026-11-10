@@ -33,7 +33,7 @@ use Checkslip\Model\Slip;
 $checkslip = new Client(apiKey: getenv('CHECKSLIP_API_KEY'));
 ```
 
-### ค้นหาจากข้อความ QR บนสลิป
+### ดึงข้อมูลจากข้อความ QR บนสลิป
 
 อ่าน QR code บนสลิปด้วยตัวอ่าน QR อะไรก็ได้ แล้วส่งข้อความที่ได้มา
 
@@ -52,7 +52,7 @@ if ($check->isFound() && $check->slip instanceof Slip) {
 
 จำนวนเงินคืนมาเป็นสตางค์ (100 สตางค์ = 1 บาท) ใช้ `toBaht()` จัดรูปแบบได้ เลขบัญชีคืนมาเฉพาะ 4 ตัวท้าย
 
-### ค้นหาจากรูปสลิป
+### ดึงข้อมูลจากรูปสลิป
 
 ส่ง `Upload` แทนข้อความ QR รับไฟล์ JPEG, PNG และ WebP ขนาดไม่เกิน 10 MB Checkslip จะอ่าน QR จากรูปให้ และไม่เก็บรูปไว้
 
@@ -80,7 +80,7 @@ $check = $checkslip->slips->lookup(
 | ----------- | ------------------------------------------------------------------------------------------ | --------- |
 | `FOUND`     | ธนาคารคืนรายการโอนมา ข้อมูลอยู่ใน `$check->slip`                                              | 1         |
 | `NOT_FOUND` | ธนาคารไม่มีรายการโอนที่อ้างอิงนี้                                                                | 0         |
-| `DUPLICATE` | บัญชีนี้เคยค้นรายการนี้แล้ว `$check->duplicateOf` ชี้ไปที่ครั้งก่อน                                   | 0         |
+| `DUPLICATE` | บัญชีนี้เคยดึงข้อมูลรายการนี้แล้ว `$check->duplicateOf` ชี้ไปที่ครั้งก่อน                                   | 0         |
 | `PENDING`   | ธนาคารยังไม่ตอบ Checkslip จะถามต่อให้ และส่ง webhook `slip.checked` เมื่อได้ผล ส่วน `$check->retryAfter` บอกว่าควรรออีกกี่วินาทีก่อนอ่านซ้ำด้วย `slips->get()` | 0 |
 
 ทั้งหมดนี้เป็นผลลัพธ์ปกติ SDK จึงคืนค่ากลับมา ส่วนปัญหาที่ตัวคำขอเอง เช่น QR ที่อ่านไม่ออก จะโยนเป็น exception
@@ -169,7 +169,7 @@ while ($page = $page->nextPage()) {
 
 ## Webhooks
 
-Checkslip ส่งข้อความ `slip.checked` ไปที่ endpoint ของคุณเมื่อการค้นหาเสร็จ รวมถึงรายการที่เคยเป็น `PENDING` ข้อความถูกเซ็นด้วยมาตรฐาน [Standard Webhooks](https://www.standardwebhooks.com) ให้ตรวจลายเซ็นก่อนเชื่อข้อความทุกครั้ง
+Checkslip ส่งข้อความ `slip.checked` ไปที่ endpoint ของคุณเมื่อการดึงข้อมูลสลิปเสร็จ รวมถึงรายการที่เคยเป็น `PENDING` ข้อความถูกเซ็นด้วยมาตรฐาน [Standard Webhooks](https://www.standardwebhooks.com) ให้ตรวจลายเซ็นก่อนเชื่อข้อความทุกครั้ง
 
 ```php
 use Checkslip\Webhook\Webhook;
@@ -218,7 +218,7 @@ $checkslip = new Client(
     baseUrl: 'https://api.checkslip.com',   // ค่าเริ่มต้น
     maxRetries: 2,                          // ค่าเริ่มต้น
     timeout: 30.0,                          // วินาทีต่อหนึ่งครั้ง ใช้กับไคลเอนต์ Guzzle และ Symfony
-    httpClient: $myPsr18Client,             // ค่าเริ่มต้น: ค้นหาให้เอง
+    httpClient: $myPsr18Client,             // ค่าเริ่มต้น: หาตัวที่ติดตั้งไว้ให้เอง
 );
 ```
 
