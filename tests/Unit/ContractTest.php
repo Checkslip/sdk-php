@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Checkslip\Tests\Unit;
 
+use Checkslip\Enum\CustomerFreeReason;
 use Checkslip\Enum\FreeReason;
 use Checkslip\Enum\Outcome;
 use Checkslip\Model\ApiRequestRecord;
@@ -182,6 +183,29 @@ final class ContractTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->client()->slips->lookup(slip: '   ');
+    }
+
+    /**
+     * The API closed the free_reason filter to the nine reasons a customer
+     * can receive, so the client offers CustomerFreeReason for it and keeps
+     * the wider FreeReason for what the API sends back.
+     */
+    public function testTheFreeReasonFilterTakesTheReasonsACustomerReceives(): void
+    {
+        $this->http->addResponse(self::json(200, ['items' => [], 'next_cursor' => null]));
+        $this->client()->slips->list(
+            freeReason: [CustomerFreeReason::Duplicate, CustomerFreeReason::TooOld],
+        );
+
+        $query = $this->lastRequest()->getUri()->getQuery();
+        self::assertStringContainsString('free_reason=DUPLICATE', $query);
+        self::assertStringContainsString('free_reason=TOO_OLD', $query);
+
+        // The three values FreeReason carries on top of these (PENDING,
+        // NO_CREDIT, HOLD_EXPIRED) are not filterable, which is the point of
+        // the narrower type.
+        self::assertCount(9, CustomerFreeReason::cases());
+        self::assertSame('OTHER', CustomerFreeReason::Other->value);
     }
 
     /**
