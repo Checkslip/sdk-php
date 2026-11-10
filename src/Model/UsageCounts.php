@@ -21,19 +21,15 @@ final class UsageCounts
         public readonly int $freeInvalidFile,
         public readonly int $freeQrTampered,
         public readonly int $freeTooOld,
-        /**
-         * Always 0: the API no longer counts this reason, and the field is
-         * going away. These lookups are counted in $freeOther. An absent
-         * field reads as 0, so reading it stays safe either way.
-         */
-        public readonly int $freeNoCredit,
-        /** Going away with $freeNoCredit, and counted in $freeOther the same way. */
-        public readonly int $freeHoldExpired,
         public readonly int $freeSystemError,
         /**
-         * Lookups that were not charged with no reason given, including the
-         * two deprecated counts above and any reason this version does not
-         * know. Reads as 0 against a server that does not send it.
+         * Lookups that were not charged with no reason given, including any
+         * reason this version does not know. Reads as 0 against a server that
+         * does not send it.
+         *
+         * The API used to also return free_no_credit and free_hold_expired.
+         * Both had been returning 0 on every account, and those lookups count
+         * here.
          */
         public readonly int $freeOther = 0,
     ) {}
@@ -53,10 +49,8 @@ final class UsageCounts
             Arr::int($d, 'free_invalid_file'),
             Arr::int($d, 'free_qr_tampered'),
             Arr::int($d, 'free_too_old'),
-            // These three may be absent, so they fall back to 0.
-            Arr::intOrNull($d, 'free_no_credit') ?? 0,
-            Arr::intOrNull($d, 'free_hold_expired') ?? 0,
             Arr::int($d, 'free_system_error'),
+            // free_other may be absent, so it falls back to 0.
             Arr::intOrNull($d, 'free_other') ?? 0,
         );
     }
