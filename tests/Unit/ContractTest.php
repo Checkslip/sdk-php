@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Checkslip\Tests\Unit;
 
 use Checkslip\Enum\CustomerFreeReason;
+use Checkslip\Enum\EndpointDisabledReason;
 use Checkslip\Enum\FreeReason;
 use Checkslip\Enum\Outcome;
 use Checkslip\Model\ApiRequestRecord;
+use Checkslip\Model\Endpoint;
 use Checkslip\Model\SlipCheck;
 use Checkslip\Model\UsageCounts;
 use Checkslip\Resource\AbstractResource;
@@ -239,5 +241,32 @@ final class ContractTest extends TestCase
 
         self::assertSame('OTHER', FreeReason::Other->value);
         self::assertSame(FreeReason::Other, FreeReason::tryFrom('OTHER'));
+    }
+
+    /**
+     * An endpoint the Checkslip team turned off reads back as the STAFF case,
+     * and a reason this release has no case for still reaches the caller as
+     * the raw string, which is what EndpointDisabledReason's doc promises.
+     */
+    public function testEndpointDisabledReasonCarriesStaffAndAnUnknownReason(): void
+    {
+        $base = [
+            'id' => 'ep_1',
+            'url' => 'https://shop.test/hooks',
+            'description' => null,
+            'event_types' => ['slip.checked'],
+            'enabled' => false,
+            'secret_hint' => '…a1b2',
+            'previous_secret_expires_at' => null,
+            'created_at' => '2026-11-01T00:00:00Z',
+            'updated_at' => '2026-11-01T00:00:00Z',
+        ];
+
+        $staff = Endpoint::fromArray(['disabled_reason' => 'STAFF'] + $base);
+        self::assertSame(EndpointDisabledReason::Staff, $staff->disabledReason);
+        self::assertSame('STAFF', EndpointDisabledReason::Staff->value);
+
+        $later = Endpoint::fromArray(['disabled_reason' => 'SOMETHING_ADDED_LATER'] + $base);
+        self::assertSame('SOMETHING_ADDED_LATER', $later->disabledReason);
     }
 }

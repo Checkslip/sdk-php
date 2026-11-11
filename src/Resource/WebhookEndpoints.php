@@ -59,8 +59,17 @@ final class WebhookEndpoints extends AbstractResource
         return Endpoint::fromArray($this->fetch(self::path('/api/webhooks/endpoints/%s', $endpointId)));
     }
 
+    // The "Reply to the email" sentence below is copied word for word from
+    // the contract's fix for ENDPOINT_DISABLED_BY_STAFF, so a customer reading
+    // this doc and a customer reading the error body see the same words. If the
+    // contract changes it, follow the contract. The sdk workspace's
+    // scripts/check-problem-text.py compares the two.
     /**
      * Changes only the fields you pass. Set $clearDescription to remove the description.
+     *
+     * Setting enabled to true fails with 409 ENDPOINT_DISABLED_BY_STAFF if the
+     * Checkslip team turned the endpoint off. Reply to the email about it, or
+     * open a case to have it turned on.
      *
      * @param list<EventType|string>|null $eventTypes
      */
