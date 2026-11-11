@@ -59,6 +59,11 @@ final class WebhookEndpoints extends AbstractResource
         return Endpoint::fromArray($this->fetch(self::path('/api/webhooks/endpoints/%s', $endpointId)));
     }
 
+    // The "Reply to the email" sentence below is copied word for word from
+    // the contract's fix for ENDPOINT_DISABLED_BY_STAFF, so a customer reading
+    // this doc and a customer reading the error body see the same words. If the
+    // contract changes it, follow the contract. The sdk workspace's
+    // scripts/check-problem-text.py compares the two.
     /**
      * Changes only the fields you pass. Set $clearDescription to remove the description.
      *
