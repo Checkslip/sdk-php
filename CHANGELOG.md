@@ -4,6 +4,18 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.5.0](https://github.com/Checkslip/sdk-php/compare/v0.4.0...v0.5.0) (2026-11-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* a STAFF endpoint used to read back as the string 'STAFF', because the enum had no case for it. It now reads back as EndpointDisabledReason::Staff, so code that compared the field with the string stops matching it.
+
+### Features
+
+* disabled_reason can say STAFF ([24bd11c](https://github.com/Checkslip/sdk-php/commit/24bd11c4d49ca0b45968170bc1c6a2b258cee160))
+
+
 ## [0.4.0](https://github.com/Checkslip/sdk-php/compare/v0.3.1...v0.4.0) (2026-11-10)
 
 
