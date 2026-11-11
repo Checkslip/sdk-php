@@ -16,10 +16,6 @@ All notable changes to this package are listed here. The format follows
 * disabled_reason can say STAFF ([24bd11c](https://github.com/Checkslip/sdk-php/commit/24bd11c4d49ca0b45968170bc1c6a2b258cee160))
 
 
-### Miscellaneous Chores
-
-* note where the staff-disabled sentence is copied from ([ce4a6fd](https://github.com/Checkslip/sdk-php/commit/ce4a6fd20d1b389a8bb8560df71580e7808fc5bd))
-
 ## [0.4.0](https://github.com/Checkslip/sdk-php/compare/v0.3.1...v0.4.0) (2026-11-10)
 
 
