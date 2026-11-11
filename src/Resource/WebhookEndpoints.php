@@ -62,6 +62,10 @@ final class WebhookEndpoints extends AbstractResource
     /**
      * Changes only the fields you pass. Set $clearDescription to remove the description.
      *
+     * Setting enabled to true fails with 409 ENDPOINT_DISABLED_BY_STAFF if the
+     * Checkslip team turned the endpoint off. Reply to the email about it, or
+     * open a case to have it turned on.
+     *
      * @param list<EventType|string>|null $eventTypes
      */
     public function update(
