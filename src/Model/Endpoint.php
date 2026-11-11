@@ -23,6 +23,7 @@ final class Endpoint
         public readonly ?string $description,
         public readonly array $eventTypes,
         public readonly bool $enabled,
+        /** Why the endpoint is off, or null while it is on. */
         public readonly EndpointDisabledReason|string|null $disabledReason,
         /** Last 4 characters of the signing secret, to tell secrets apart. */
         public readonly string $secretHint,
