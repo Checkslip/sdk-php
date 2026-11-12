@@ -9,9 +9,7 @@ All notable changes to this package are listed here. The format follows
 
 ### Bug Fixes
 
-* **docs:** apiKey is required; this client does not read the environment ([1dd8fe9](https://github.com/Checkslip/sdk-php/commit/1dd8fe9bce3d89123787c85b690c625881c9e871))
 * **docs:** apiKey is required; this client does not read the environment ([69997c9](https://github.com/Checkslip/sdk-php/commit/69997c9d37ed49bf9f29dfcd77d5b6184db2248c))
-* **docs:** cast the API key the quick start reads from the environment ([ad1e464](https://github.com/Checkslip/sdk-php/commit/ad1e464c96c3dbde750b4dfc4bb16532169b2902))
 * **docs:** cast the API key the quick start reads from the environment ([b087676](https://github.com/Checkslip/sdk-php/commit/b087676b640f5101522cc28215153c0d4f993b51))
 
 ## [0.6.0](https://github.com/Checkslip/sdk-php/compare/v0.5.0...v0.6.0) (2026-11-12)
