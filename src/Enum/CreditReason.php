@@ -16,5 +16,6 @@ enum CreditReason: string
     case Expire = 'EXPIRE';
     case StaffAdjust = 'STAFF_ADJUST';
     case AccountDeleted = 'ACCOUNT_DELETED';
+    case AccountRestored = 'ACCOUNT_RESTORED';
     case DevGrant = 'DEV_GRANT';
 }

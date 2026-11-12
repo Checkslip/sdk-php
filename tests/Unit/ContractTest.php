@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Checkslip\Tests\Unit;
 
+use Checkslip\Enum\CreditReason;
 use Checkslip\Enum\CustomerFreeReason;
 use Checkslip\Enum\EndpointDisabledReason;
 use Checkslip\Enum\FreeReason;
 use Checkslip\Enum\Outcome;
 use Checkslip\Model\ApiRequestRecord;
+use Checkslip\Model\CreditEntry;
 use Checkslip\Model\Endpoint;
 use Checkslip\Model\SlipCheck;
 use Checkslip\Model\UsageCounts;
@@ -268,5 +270,32 @@ final class ContractTest extends TestCase
 
         $later = Endpoint::fromArray(['disabled_reason' => 'SOMETHING_ADDED_LATER'] + $base);
         self::assertSame('SOMETHING_ADDED_LATER', $later->disabledReason);
+    }
+
+    /**
+     * A ledger entry written when staff restore an account reads back as the
+     * AccountRestored case, and a reason this release has no case for still
+     * reaches the caller as the raw string. The billing contract calls
+     * CreditReason an open set, so a value added later must not throw.
+     */
+    public function testCreditReasonCarriesAccountRestoredAndAnUnknownReason(): void
+    {
+        $base = [
+            'id' => '0193a1f0-0000-7000-8000-000000000001',
+            'delta' => 50,
+            'balance_after' => 50,
+            'expires_at_after' => null,
+            'free_reason' => null,
+            'ref_type' => 'STAFF',
+            'ref_id' => null,
+            'created_at' => '2026-11-12T00:00:00Z',
+        ];
+
+        $restored = CreditEntry::fromArray(['reason' => 'ACCOUNT_RESTORED'] + $base);
+        self::assertSame(CreditReason::AccountRestored, $restored->reason);
+        self::assertSame('ACCOUNT_RESTORED', CreditReason::AccountRestored->value);
+
+        $later = CreditEntry::fromArray(['reason' => 'SOMETHING_ADDED_LATER'] + $base);
+        self::assertSame('SOMETHING_ADDED_LATER', $later->reason);
     }
 }
