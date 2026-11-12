@@ -80,7 +80,7 @@ Pass the QR text or an image, not both.
 | ----------- | --------------------------------------------------------------------------------------------- | ----------- |
 | `FOUND`     | The bank returned the transfer. Details are in `$check->slip`.                                | 1           |
 | `NOT_FOUND` | The bank has no transfer with this reference.                                                  | 0           |
-| `DUPLICATE` | This account already looked up this transfer. `$check->duplicateOf` points at the earlier one. | 0           |
+| `DUPLICATE` | This account already looked this transfer up and found it, within the time we keep transfer references · `$check->duplicateOf` points to the check that found it | 0           |
 | `PENDING`   | The bank has not answered yet. Checkslip keeps asking and sends a `slip.checked` webhook when it has the result. `$check->retryAfter` says how long to wait before reading it again with `slips->get()`. | 0 |
 
 These are normal results, so the SDK returns them. Problems with the request itself, such as an unreadable QR code, come back as exceptions.
