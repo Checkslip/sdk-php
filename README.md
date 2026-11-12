@@ -214,7 +214,7 @@ Downloads return a PSR-7 `StreamInterface`, so a large CSV or evidence file does
 
 ```php
 $checkslip = new Client(
-    apiKey: 'csk_...',                      // default: CHECKSLIP_API_KEY in the environment
+    apiKey: 'csk_...',                      // required: this client does not read the environment
     baseUrl: 'https://api.checkslip.com',   // default
     maxRetries: 2,                          // default
     timeout: 30.0,                          // seconds per attempt, applied to Guzzle and Symfony clients
