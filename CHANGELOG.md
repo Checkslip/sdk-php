@@ -9,11 +9,10 @@ All notable changes to this package are listed here. The format follows
 
 ### ⚠ BREAKING CHANGES
 
-* ACCOUNT_RESTORED used to read back as the string 'ACCOUNT_RESTORED', because the enum had no case for it. It now reads back as CreditReason::AccountRestored, so code that compared the field with the string stops matching it.
+* the reason on a restored account's credit entry used to read back as the string 'ACCOUNT_RESTORED', because the enum had no case for it. It now reads back as CreditReason::AccountRestored, so code that compared the field with the string stops matching it.
 
 ### Features
 
-* a credit entry's reason can say ACCOUNT_RESTORED ([3b0ff75](https://github.com/Checkslip/sdk-php/commit/3b0ff75fd999cda4f3abeb685f6568fead6b1357))
 * a credit entry's reason can say ACCOUNT_RESTORED ([9d427f2](https://github.com/Checkslip/sdk-php/commit/9d427f271185930fd2a225c916d2e4fc2c5ad5b2))
 
 ## [0.5.0](https://github.com/Checkslip/sdk-php/compare/v0.4.0...v0.5.0) (2026-11-11)
