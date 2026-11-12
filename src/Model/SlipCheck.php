@@ -12,10 +12,10 @@ use Checkslip\Internal\Enums;
  * The result of POST /api/slips/lookup.
  *
  * $outcome says what the bank had: FOUND (the transfer and its data are in
- * $slip), NOT_FOUND, DUPLICATE (your account already looked this transfer up,
- * see $duplicateOf) or PENDING (the bank has not posted it yet). Only FOUND
- * uses a credit. Checkslip reports what the bank returned; whether to accept
- * the payment is your call, made against your own order.
+ * $slip), NOT_FOUND, DUPLICATE (your account already looked this transfer up
+ * and found it, see $duplicateOf) or PENDING (the bank has not posted it
+ * yet). Only FOUND uses a credit. Checkslip reports what the bank returned;
+ * whether to accept the payment is your call, made against your own order.
  */
 final class SlipCheck
 {

@@ -7,7 +7,7 @@ namespace Checkslip\Model;
 use Checkslip\Internal\Arr;
 
 /**
- * The earlier lookup in your account that already returned this transfer.
+ * The check in your account that first found this transfer.
  */
 final class DuplicateOf
 {
