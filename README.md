@@ -30,7 +30,7 @@ Create an API key in the Checkslip web app and keep it on your server.
 use Checkslip\Client;
 use Checkslip\Model\Slip;
 
-$checkslip = new Client(apiKey: getenv('CHECKSLIP_API_KEY'));
+$checkslip = new Client(apiKey: (string) getenv('CHECKSLIP_API_KEY'));
 ```
 
 ### Look up a slip by its QR text
