@@ -214,7 +214,7 @@ try {
 
 ```php
 $checkslip = new Client(
-    apiKey: 'csk_...',                      // ค่าเริ่มต้น: CHECKSLIP_API_KEY จาก environment
+    apiKey: 'csk_...',                      // ต้องส่งเอง: ไคลเอนต์ตัวนี้ไม่อ่าน environment ให้
     baseUrl: 'https://api.checkslip.com',   // ค่าเริ่มต้น
     maxRetries: 2,                          // ค่าเริ่มต้น
     timeout: 30.0,                          // วินาทีต่อหนึ่งครั้ง ใช้กับไคลเอนต์ Guzzle และ Symfony
