@@ -22,7 +22,7 @@ use Psr\Http\Message\StreamFactoryInterface;
  * Entry point to the Checkslip API.
  *
  * ```php
- * $client = new Checkslip\Client(apiKey: getenv('CHECKSLIP_API_KEY'));
+ * $client = new Checkslip\Client(apiKey: (string) getenv('CHECKSLIP_API_KEY'));
  * $check = $client->slips->lookup(qr: $qrText);
  * ```
  */

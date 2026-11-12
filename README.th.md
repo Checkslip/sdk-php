@@ -30,7 +30,7 @@ composer require checkslip/sdk guzzlehttp/guzzle
 use Checkslip\Client;
 use Checkslip\Model\Slip;
 
-$checkslip = new Client(apiKey: getenv('CHECKSLIP_API_KEY'));
+$checkslip = new Client(apiKey: (string) getenv('CHECKSLIP_API_KEY'));
 ```
 
 ### ดึงข้อมูลจากข้อความ QR บนสลิป
