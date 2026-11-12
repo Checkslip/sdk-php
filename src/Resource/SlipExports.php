@@ -28,6 +28,9 @@ final class SlipExports extends AbstractResource
      * @param list<bool|string>|null $charged
      * @param list<CustomerFreeReason|string>|null $freeReason The nine reasons a customer can receive
      * @param string|null $cursor The continue_cursor of an earlier, truncated export
+     *
+     * Not available yet: the API does not accept this request, so calling it
+     * returns an error.
      */
     public function create(
         array $columns,
@@ -65,6 +68,10 @@ final class SlipExports extends AbstractResource
         return SlipExport::fromArray($data);
     }
 
+    /**
+     * Not available yet: the API does not accept this request, so calling it
+     * returns an error.
+     */
     public function get(string $exportId): SlipExport
     {
         return SlipExport::fromArray($this->fetch(self::path('/api/slips/exports/%s', $exportId)));
@@ -76,6 +83,9 @@ final class SlipExports extends AbstractResource
      *
      * The part link is signed and short-lived; fetch a fresh one with
      * {@see get()} once it has expired.
+     *
+     * Not available yet: the API does not accept this request, so calling it
+     * returns an error.
      */
     public function downloadPart(SlipExportPart|string $part): StreamInterface
     {
