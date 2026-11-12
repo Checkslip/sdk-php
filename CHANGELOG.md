@@ -4,6 +4,14 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.6.1](https://github.com/Checkslip/sdk-php/compare/v0.6.0...v0.6.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* **docs:** apiKey is required; this client does not read the environment ([69997c9](https://github.com/Checkslip/sdk-php/commit/69997c9d37ed49bf9f29dfcd77d5b6184db2248c))
+* **docs:** cast the API key the quick start reads from the environment ([b087676](https://github.com/Checkslip/sdk-php/commit/b087676b640f5101522cc28215153c0d4f993b51))
+
 ## [0.6.0](https://github.com/Checkslip/sdk-php/compare/v0.5.0...v0.6.0) (2026-11-12)
 
 
