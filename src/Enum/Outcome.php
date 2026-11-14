@@ -6,6 +6,10 @@ namespace Checkslip\Enum;
 
 /**
  * What the lookup found. Only FOUND uses a credit.
+ *
+ * A lookup returns FOUND, NOT_FOUND or DUPLICATE; the other values appear in
+ * the lookup history and in webhooks for lookups the API answered with an
+ * error.
  */
 enum Outcome: string
 {
