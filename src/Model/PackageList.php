@@ -16,9 +16,10 @@ final class PackageList
         public readonly bool $checkoutOpen,
         public readonly bool $pricesIncludeVat,
         /**
-         * The VAT rate in force now, in basis points: 700 is 7%, and 0 means
-         * no VAT applies to any package or order yet. Read it to find out
-         * whether VAT is in effect.
+         * The VAT rate in force now, in basis points: 700 is 7%, and 0 means no
+         * VAT applies to any package or order yet. Use it to show the rate and to
+         * tell whether VAT is in effect; read the amount to pay from each
+         * package's $priceTotal instead of computing VAT yourself.
          */
         public readonly int $vatRateBp,
         public readonly array $items,

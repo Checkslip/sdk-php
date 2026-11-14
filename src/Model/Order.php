@@ -22,9 +22,9 @@ final class Order
         public readonly int $credits,
         public readonly Money $amount,
         /**
-         * The VAT already inside $amount, fixed when the order was made. Do
-         * not add it to $amount: $amount is what the order asks for. It is
-         * null when the order carries no VAT.
+         * The VAT already inside $amount, fixed when the order was made and not
+         * changed by a later rate change. Do not add it to $amount: $amount is
+         * what the order asks for. It is null when the order carries no VAT.
          */
         public readonly ?Money $vat,
         public readonly PaymentMethod|string|null $paymentMethod,
