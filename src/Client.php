@@ -28,7 +28,7 @@ use Psr\Http\Message\StreamFactoryInterface;
  */
 final class Client
 {
-    public const VERSION = '0.6.2'; // x-release-please-version
+    public const VERSION = '0.7.0'; // x-release-please-version
 
     public const DEFAULT_BASE_URL = 'https://api.checkslip.com';
 

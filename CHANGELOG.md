@@ -4,6 +4,19 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.7.0](https://github.com/Checkslip/sdk-php/compare/v0.6.2...v0.7.0) (2026-11-14)
+
+
+### Features
+
+* $vat, $priceTotal and the two other VAT fields ([8fdb551](https://github.com/Checkslip/sdk-php/commit/8fdb551d7060fab955f8688902be3680554d310c))
+
+
+### Bug Fixes
+
+* **docs:** the Outcome enum says why it has nine cases ([6a1df0e](https://github.com/Checkslip/sdk-php/commit/6a1df0e3bf961a5700a972aacccb83ca19f8a43e))
+* **docs:** the outcome list and the webhook field match the API ([3d4bf0d](https://github.com/Checkslip/sdk-php/commit/3d4bf0d843980433d2275b0d8b15c8dfa327c25b))
+
 ## [0.6.2](https://github.com/Checkslip/sdk-php/compare/v0.6.1...v0.6.2) (2026-11-14)
 
 
