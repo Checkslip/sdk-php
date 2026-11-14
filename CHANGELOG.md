@@ -4,6 +4,14 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.6.2](https://github.com/Checkslip/sdk-php/compare/v0.6.1...v0.6.2) (2026-11-14)
+
+
+### Bug Fixes
+
+* $retryAfter and isPending() on a lookup are deprecated ([0e5dd0b](https://github.com/Checkslip/sdk-php/commit/0e5dd0b5f3ad2679c352bb6dcadaa0c2951b14d2))
+* **docs:** PENDING is not returned; you get a 503 UNAVAILABLE error ([976a74f](https://github.com/Checkslip/sdk-php/commit/976a74f37cb1ec003cf3055626d57f5c97753227))
+
 ## [0.6.1](https://github.com/Checkslip/sdk-php/compare/v0.6.0...v0.6.1) (2026-11-12)
 
 
