@@ -17,8 +17,8 @@ final class PackageList
         public readonly bool $pricesIncludeVat,
         /**
          * The VAT rate in force now, in basis points: 700 is 7%, and 0 means
-         * no VAT applies anywhere yet. Read it to find out whether VAT is in
-         * effect.
+         * no VAT applies to any package or order yet. Read it to find out
+         * whether VAT is in effect.
          */
         public readonly int $vatRateBp,
         public readonly array $items,
