@@ -10,14 +10,20 @@
         "satang": 19900,
         "currency": "THB"
       },
+      "price_total": {
+        "satang": 21293,
+        "currency": "THB"
+      },
       "price_per_credit": {
         "satang": 199,
         "currency": "THB"
       },
+      "price_per_credit_baht": "1.990",
       "credits": 100,
       "validity_days": 365,
       "for_sale": true,
       "sort": 1
     }
-  ]
+  ],
+  "vat_rate_bp": 700
 }

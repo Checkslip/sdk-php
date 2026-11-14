@@ -21,6 +21,12 @@ final class Order
         public readonly string $packageNameTh,
         public readonly int $credits,
         public readonly Money $amount,
+        /**
+         * The VAT already inside $amount, fixed when the order was made. Do
+         * not add it to $amount: $amount is what the order asks for. It is
+         * null when the order carries no VAT.
+         */
+        public readonly ?Money $vat,
         public readonly PaymentMethod|string|null $paymentMethod,
         public readonly ?string $receiptId,
         public readonly \DateTimeImmutable $createdAt,
@@ -43,6 +49,7 @@ final class Order
             Arr::str($d, 'package_name_th'),
             Arr::int($d, 'credits'),
             Money::fromArray(Arr::obj($d, 'amount')),
+            ($vat = Arr::objOrNull($d, 'vat')) !== null ? Money::fromArray($vat) : null,
             Enums::ofNullable(PaymentMethod::class, Arr::strOrNull($d, 'payment_method')),
             Arr::strOrNull($d, 'receipt_id'),
             Arr::date($d, 'created_at'),

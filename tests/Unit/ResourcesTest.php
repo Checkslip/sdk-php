@@ -91,11 +91,24 @@ final class ResourcesTest extends TestCase
         $packages = $billing->packages->list();
         self::assertTrue($packages->checkoutOpen);
         self::assertSame('199.00', $packages->items[0]->price->toBaht());
+        // The VAT numbers are read, never derived: a caller who multiplies or
+        // adds instead of reading them is the mistake these fields prevent.
+        self::assertSame(700, $packages->vatRateBp);
+        self::assertSame('212.93', $packages->items[0]->priceTotal->toBaht());
+        self::assertSame('1.990', $packages->items[0]->pricePerCreditBaht);
 
         $orders = $billing->orders->list(status: OrderStatus::Paid);
         self::assertSame('status=PAID', $this->lastRequest()->getUri()->getQuery());
         self::assertInstanceOf(Order::class, $orders->items[0]);
         self::assertSame(PaymentMethod::PromptPay, $orders->items[0]->paymentMethod);
+        // VAT sits inside $amount: the fixture's 13.02 is the VAT within
+        // 199.00, not a surcharge on it.
+        self::assertSame('13.02', $orders->items[0]->vat?->toBaht());
+        // An order with no VAT leaves the field null rather than zero, so a
+        // caller can tell "no VAT" from "zero VAT".
+        $noVat = self::fixture('order');
+        unset($noVat['vat']);
+        self::assertNull(Order::fromArray($noVat)->vat);
 
         $receipt = $billing->receipts->get('0192d4e0-0000-7000-8000-0000000000d2');
         self::assertSame(700, $receipt->vat?->rateBp);
