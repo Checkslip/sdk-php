@@ -29,8 +29,8 @@ final class SlipCheckedData
         /**
          * Always false today: a lookup is answered in one call, so no lookup is
          * PENDING first. The field stays, and stays required, so code that
-         * reads it keeps working. True used to mean this lookup came back
-         * PENDING and this is its final answer.
+         * reads it keeps working. A true value used to mean this lookup came
+         * back PENDING and this is its final answer.
          */
         public readonly bool $resolvedAfterPending,
     ) {}
