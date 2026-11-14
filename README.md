@@ -44,9 +44,11 @@ $check = $checkslip->slips->lookup(
 );
 
 if ($check->isFound() && $check->slip instanceof Slip) {
+    $sender = $check->slip->sender;
+    $receiver = $check->slip->receiver;
     echo $check->slip->amount->toBaht(), " THB\n";
-    echo 'from ', $check->slip->sender->nameEn, ' at ', $check->slip->sender->bank->code, "\n";
-    echo 'to ', $check->slip->receiver->nameEn, ' ', $check->slip->receiver->account, "\n";
+    echo 'from ', $sender->nameEn, ' at ', $sender->bank->code, "\n";
+    echo 'to ', $receiver->nameEn, ' ', $receiver->account, "\n";
 }
 ```
 
