@@ -30,7 +30,10 @@ final class SlipCheck
         // API, so this client does not carry them.
         /**
          * Seconds the API asked you to wait before reading the result again.
-         * Set only on a PENDING answer (HTTP 202).
+         *
+         * @deprecated A lookup is answered in one call and never answers with
+         * 202, so this is always null. The retry wait on a 503 UNAVAILABLE
+         * error is a different value. It stays for callers that read it.
          */
         public readonly ?int $retryAfter = null,
     ) {}
@@ -56,6 +59,11 @@ final class SlipCheck
         return $this->outcome === Outcome::Found;
     }
 
+    /**
+     * @deprecated A lookup is answered in one call, so the API does not return
+     * the PENDING outcome and this is always false. It stays for callers that
+     * call it.
+     */
     public function isPending(): bool
     {
         return $this->outcome === Outcome::Pending;

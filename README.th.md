@@ -81,7 +81,7 @@ $check = $checkslip->slips->lookup(
 | `FOUND`     | ธนาคารคืนรายการโอนมา ข้อมูลอยู่ใน `$check->slip`                                              | 1         |
 | `NOT_FOUND` | ธนาคารไม่มีรายการโอนที่อ้างอิงนี้                                                                | 0         |
 | `DUPLICATE` | บัญชีนี้เคยดึงข้อมูลแล้วพบรายการนี้ ภายในช่วงที่เราเก็บเลขอ้างอิงรายการไว้ · `$check->duplicateOf` ชี้ไปที่การตรวจครั้งที่พบ | 0         |
-| `PENDING`   | ธนาคารยังไม่ตอบ Checkslip จะถามต่อให้ และส่ง webhook `slip.checked` เมื่อได้ผล ส่วน `$check->retryAfter` บอกว่าควรรออีกกี่วินาทีก่อนอ่านซ้ำด้วย `slips->get()` | 0 |
+| `PENDING`   | ธนาคารยังไม่แสดงรายการ · API ไม่คืนค่านี้แล้ว เพราะการตรวจสอบรายการโอนกับธนาคารจบในครั้งเดียว กรณีนี้จะได้ error 503 `UNAVAILABLE` แทน · ค่านี้ยังอยู่ใน type โค้ดเดิมจึงยัง compile ได้ · `$check->retryAfter` ถูกทำเครื่องหมาย deprecated และเป็น `null` เสมอ | 0 |
 
 ทั้งหมดนี้เป็นผลลัพธ์ปกติ SDK จึงคืนค่ากลับมา ส่วนปัญหาที่ตัวคำขอเอง เช่น QR ที่อ่านไม่ออก จะโยนเป็น exception
 
@@ -169,7 +169,7 @@ while ($page = $page->nextPage()) {
 
 ## Webhooks
 
-Checkslip ส่งข้อความ `slip.checked` ไปที่ endpoint ของคุณเมื่อการดึงข้อมูลสลิปเสร็จ รวมถึงรายการที่เคยเป็น `PENDING` ข้อความถูกเซ็นด้วยมาตรฐาน [Standard Webhooks](https://www.standardwebhooks.com) ให้ตรวจลายเซ็นก่อนเชื่อข้อความทุกครั้ง
+Checkslip ส่งข้อความ `slip.checked` ไปที่ endpoint ของคุณเมื่อการดึงข้อมูลสลิปเสร็จ ข้อความถูกเซ็นด้วยมาตรฐาน [Standard Webhooks](https://www.standardwebhooks.com) ให้ตรวจลายเซ็นก่อนเชื่อข้อความทุกครั้ง
 
 ```php
 use Checkslip\Webhook\Webhook;

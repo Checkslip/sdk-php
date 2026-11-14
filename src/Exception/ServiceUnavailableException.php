@@ -7,8 +7,9 @@ namespace Checkslip\Exception;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * HTTP 503, for example UNAVAILABLE (the bank did not answer) or
- * CREDIT_UNAVAILABLE. Carries Retry-After when the API sent one.
+ * HTTP 503, for example UNAVAILABLE (there is no definite answer from the
+ * banking system right now) or CREDIT_UNAVAILABLE. Carries Retry-After when
+ * the API sent one.
  */
 class ServiceUnavailableException extends ServerException
 {
