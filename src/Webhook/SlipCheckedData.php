@@ -27,10 +27,9 @@ final class SlipCheckedData
         public readonly Slip|SlipSummary|null $slip,
         public readonly ?DuplicateOf $duplicateOf,
         /**
-         * Always false today: a lookup is answered in one call, so no lookup is
-         * PENDING first. The field stays, and stays required, so code that
-         * reads it keeps working. A true value used to mean this lookup came
-         * back PENDING and this is its final answer.
+         * Always false today: no lookup is answered PENDING, so none is
+         * resolved after one. The field stays in the payload, and required, so
+         * code that reads it keeps working.
          */
         public readonly bool $resolvedAfterPending,
     ) {}

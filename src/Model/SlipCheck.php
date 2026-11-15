@@ -60,9 +60,8 @@ final class SlipCheck
     }
 
     /**
-     * @deprecated A lookup is answered in one call, so the API does not return
-     * the PENDING outcome and this is always false. It stays for callers that
-     * call it.
+     * @deprecated Always false today: no lookup is answered PENDING, so this
+     * method always returns false. It stays for callers that call it.
      */
     public function isPending(): bool
     {
