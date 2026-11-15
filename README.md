@@ -83,7 +83,7 @@ Pass the QR text or an image, not both.
 | `FOUND`     | The bank returned the transfer. Details are in `$check->slip`.                                | 1           |
 | `NOT_FOUND` | The bank has no transfer with this reference.                                                  | 0           |
 | `DUPLICATE` | This account already looked this transfer up and found it, within the time we keep transfer references · `$check->duplicateOf` points to the check that found it | 0           |
-| `PENDING`   | The bank does not show the transfer yet. The API no longer returns this outcome: a lookup is answered in one call, and this case comes back as a 503 `UNAVAILABLE` error. The value stays in the type, so existing code still compiles. `$check->retryAfter` is deprecated and is always `null`. | 0 |
+| `PENDING`   | Not in use yet. A lookup is answered in one call, so when the bank does not show the transfer the API answers with a 503 `UNAVAILABLE` error and does not look again. The value stays in the type, so existing code still compiles. `$check->retryAfter` is deprecated and is always `null`. | 0 |
 
 These are normal results, so the SDK returns them. Problems with the request itself, such as an unreadable QR code, come back as exceptions.
 
