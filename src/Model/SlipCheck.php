@@ -33,7 +33,8 @@ final class SlipCheck
          *
          * @deprecated A lookup is answered in one call and never answers with
          * 202, so this is always null. The retry wait on a 503 UNAVAILABLE
-         * error is a different value. It stays for callers that read it.
+         * error is a different value. It stays so existing code keeps
+         * working.
          */
         public readonly ?int $retryAfter = null,
     ) {}
@@ -61,7 +62,7 @@ final class SlipCheck
 
     /**
      * @deprecated Always false today: no lookup is answered PENDING, so this
-     * method always returns false. It stays for callers that call it.
+     * method always returns false. It stays so existing code keeps working.
      */
     public function isPending(): bool
     {
