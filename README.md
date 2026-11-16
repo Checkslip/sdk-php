@@ -4,7 +4,7 @@
 
 The official PHP client for the [Checkslip API](https://checkslip.com/docs).
 
-Checkslip looks up a Thai bank transfer with the sending bank. You send the text of the QR code on a slip, or a photo of the slip, and Checkslip returns what the bank holds for that transfer: amount, time, sender and receiver. Whether to accept the payment is your decision, made against your own order.
+Checkslip looks up a Thai bank transfer with the banking system. You send the text of the QR code on a slip, or a photo of the slip, and Checkslip returns what the sending bank holds for that transfer: amount, time, sender and receiver, as far as the bank shows them. Whether to accept the payment is your decision, made against your own order.
 
 The package needs PHP 8.2 or later and any [PSR-18](https://www.php-fig.org/psr/psr-18/) HTTP client.
 
@@ -52,7 +52,7 @@ if ($check->isFound() && $check->slip instanceof Slip) {
 }
 ```
 
-Amounts come back in satang (100 satang = 1 baht); `toBaht()` formats them. Account numbers come back as their last 4 digits.
+Amounts come back in satang (100 satang = 1 baht); `toBaht()` formats them. Account numbers come back as their last 4 digits, as far as the bank shows them.
 
 ### Look up a slip from an image
 
