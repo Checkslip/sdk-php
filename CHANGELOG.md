@@ -4,6 +4,14 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.7.1](https://github.com/Checkslip/sdk-php/compare/v0.7.0...v0.7.1) (2026-11-17)
+
+
+### Miscellaneous Chores
+
+* release 0.7.1 for the corrected wording ([2496106](https://github.com/Checkslip/sdk-php/commit/2496106cb798a66d6ef3d4d670d553080c41f89c))
+* release 0.7.1 for the corrected wording ([673c009](https://github.com/Checkslip/sdk-php/commit/673c00900640327d1a80df05bb0c8ee11ad07ad3))
+
 ## [0.7.0](https://github.com/Checkslip/sdk-php/compare/v0.6.2...v0.7.0) (2026-11-14)
 
 
