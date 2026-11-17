@@ -33,7 +33,7 @@ final class Slips extends AbstractResource
     }
 
     /**
-     * Looks a transfer up with the sending bank.
+     * Looks a transfer up with the banking system.
      *
      * Pass the text read from the slip's QR code, or an {@see Upload} of the
      * slip image. Checkslip reads the QR in an image and does not keep it.
