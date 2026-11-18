@@ -4,6 +4,22 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.7.2](https://github.com/Checkslip/sdk-php/compare/v0.7.1...v0.7.2) (2026-11-18)
+
+
+### Documentation
+
+Wording only; no code or behaviour changed in this release.
+
+* The error example in 0.7.1 and earlier read the error code from `$e->code`.
+  That line is a fatal `Error` when it runs: PHP's own `Exception::$code` is a
+  protected int, so reading it from outside throws "Cannot access protected
+  property" inside your own catch block. **If you copied that example, change
+  it to `$e->errorCode`, or call `getErrorCode()`.**
+* The README now also states what `$code` and `getCode()` are — PHP's, not
+  Checkslip's — and that `getCode()` always returns `0`, so a `0` there is not
+  an empty error code.
+
 ## [0.7.1](https://github.com/Checkslip/sdk-php/compare/v0.7.0...v0.7.1) (2026-11-17)
 
 
