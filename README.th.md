@@ -89,7 +89,9 @@ $check = $checkslip->slips->lookup(
 
 ## ข้อผิดพลาด
 
-ทุก exception สืบทอดจาก `Checkslip\Exception\CheckslipException` ซึ่งเก็บ `$status` ของ HTTP, `$code` ของปัญหา, `$requestId` ที่ใช้แจ้งทีมซัพพอร์ต และเนื้อหา problem ตาม [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) ทั้งก้อน
+ทุก exception สืบทอดจาก `Checkslip\Exception\CheckslipException` ซึ่งเก็บ `$status` ของ HTTP, รหัสข้อผิดพลาดใน `$errorCode` (หรือเมธอด `getErrorCode()`), `$requestId` ที่ใช้แจ้งทีมซัพพอร์ต และเนื้อหา problem ตาม [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) ทั้งก้อน
+
+`$code` และ `getCode()` เป็นของ `Exception` ใน PHP ไม่ใช่รหัสข้อผิดพลาดของ Checkslip · `$e->code` อ่านจากข้างนอกไม่ได้ จะได้ `Error` เพราะเป็น protected และ `getCode()` คืน `0` เสมอ
 
 ```php
 use Checkslip\Exception\InsufficientCreditException;
@@ -101,13 +103,13 @@ try {
     $check = $checkslip->slips->lookup(slip: $qr);
 } catch (UnprocessableEntityException $e) {
     // ข้อความไม่ใช่ QR ของสลิป หรือ QR ถูกแก้ หรือสลิปเก่าเกินไป
-    // $e->code เป็น INVALID_QR, QR_TAMPERED, TOO_OLD หรือ INVALID_FILE และไม่หักเครดิต
+    // $e->errorCode เป็น INVALID_QR, QR_TAMPERED, TOO_OLD หรือ INVALID_FILE และไม่หักเครดิต
 } catch (InsufficientCreditException $e) {
     // เครดิตไม่พอ ต้องเติม
 } catch (RateLimitException $e) {
     echo "ลองใหม่ในอีก {$e->retryAfter} วินาที\n";
 } catch (CheckslipException $e) {
-    error_log("{$e->status} {$e->code} {$e->requestId} {$e->getMessage()}");
+    error_log("{$e->status} {$e->errorCode} {$e->requestId} {$e->getMessage()}");
     throw $e;
 }
 ```
