@@ -89,7 +89,9 @@ These are normal results, so the SDK returns them. Problems with the request its
 
 ## Errors
 
-Every exception extends `Checkslip\Exception\CheckslipException`, which carries the HTTP `$status`, the problem `$code`, the `$requestId` to quote to support, and the full [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem body.
+Every exception extends `Checkslip\Exception\CheckslipException`, which carries the HTTP `$status`, the problem code in `$errorCode` (or the `getErrorCode()` method), the `$requestId` to quote to support, and the full [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem body.
+
+`$code` and `getCode()` belong to PHP's `Exception`, not to Checkslip: reading `$e->code` from outside throws an `Error` because it is protected, and `getCode()` always returns `0`.
 
 ```php
 use Checkslip\Exception\InsufficientCreditException;
@@ -101,13 +103,13 @@ try {
     $check = $checkslip->slips->lookup(slip: $qr);
 } catch (UnprocessableEntityException $e) {
     // The text is not a slip QR code, the QR was altered, or the slip is too old.
-    // $e->code is INVALID_QR, QR_TAMPERED, TOO_OLD or INVALID_FILE. No credit used.
+    // $e->errorCode is INVALID_QR, QR_TAMPERED, TOO_OLD or INVALID_FILE. No credit used.
 } catch (InsufficientCreditException $e) {
     // Top up credits.
 } catch (RateLimitException $e) {
     echo "retry in {$e->retryAfter} s\n";
 } catch (CheckslipException $e) {
-    error_log("{$e->status} {$e->code} {$e->requestId} {$e->getMessage()}");
+    error_log("{$e->status} {$e->errorCode} {$e->requestId} {$e->getMessage()}");
     throw $e;
 }
 ```
