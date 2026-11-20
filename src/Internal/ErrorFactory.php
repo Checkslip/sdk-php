@@ -36,6 +36,7 @@ final class ErrorFactory
         $requestId = $response->getHeaderLine('X-Request-Id');
         $requestId = $requestId !== '' ? $requestId : null;
         $errors = self::fieldErrors($problem['errors'] ?? null);
+        $reason = \is_string($problem['reason'] ?? null) ? $problem['reason'] : null;
 
         $message = \sprintf('Checkslip API %d%s', $status, $code !== null ? ' ' . $code : '');
         if ($title !== null) {
@@ -60,7 +61,7 @@ final class ErrorFactory
             $status === 410 => new GoneException(...$args),
             \in_array($status, [413, 415, 422], true) => new UnprocessableEntityException(...$args),
             $status === 429 => new RateLimitException(...$args, previous: null, retryAfter: Retry::afterSeconds($response)),
-            $status === 503 => new ServiceUnavailableException(...$args, previous: null, retryAfter: Retry::afterSeconds($response)),
+            $status === 503 => new ServiceUnavailableException(...$args, previous: null, retryAfter: Retry::afterSeconds($response), reason: $reason),
             $status >= 500 => new ServerException(...$args),
             default => new CheckslipException(...$args),
         };

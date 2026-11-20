@@ -235,6 +235,84 @@ final class ErrorsTest extends TestCase
         }
     }
 
+    /**
+     * @return iterable<string, array{string, string, int}>
+     */
+    public static function unavailableReasons(): iterable
+    {
+        yield 'not seen' => ['NOT_SEEN', '60', 60];
+        yield 'source down' => ['SOURCE_DOWN', '30', 30];
+        // An open set: a word added to the API after this release of the SDK
+        // is kept as it was sent, so the caller can log it and fall back.
+        yield 'a reason this version does not know' => ['BANK_REFUSED_US', '30', 30];
+    }
+
+    /**
+     * The reason on a 503 UNAVAILABLE (verify contract 0.80.2).
+     */
+    #[DataProvider('unavailableReasons')]
+    public function testUnavailableCarriesItsReason(string $reason, string $header, int $seconds): void
+    {
+        $this->http->addResponse(self::problem(503, 'UNAVAILABLE', ['Retry-After' => $header], ['reason' => $reason]));
+
+        try {
+            $this->client(maxRetries: 0)->slips->lookup(slip: '0033000600000101030690');
+            self::fail('expected an exception');
+        } catch (ServiceUnavailableException $e) {
+            self::assertSame('UNAVAILABLE', $e->errorCode);
+            self::assertSame($reason, $e->reason);
+            self::assertSame($reason, $e->getReason());
+            self::assertSame($seconds, $e->retryAfter);
+            self::assertSame($reason, $e->problem['reason']);
+        }
+    }
+
+    public function testUnavailableWithoutAReasonReadsAsNull(): void
+    {
+        $this->http->addResponse(self::problem(503, 'UNAVAILABLE', ['Retry-After' => '30']));
+
+        try {
+            $this->client(maxRetries: 0)->slips->lookup(slip: '0033000600000101030690');
+            self::fail('expected an exception');
+        } catch (ServiceUnavailableException $e) {
+            // Our own failure sends no reason: handle it like SOURCE_DOWN.
+            self::assertNull($e->reason);
+            self::assertSame(30, $e->retryAfter);
+        }
+    }
+
+    /**
+     * Only a 503 has the typed reason. On any other status the word stays in
+     * the raw problem body, where it cannot be mistaken for a lookup that has
+     * no definite answer.
+     */
+    public function testOtherStatusesHaveNoTypedReason(): void
+    {
+        $this->http->addResponse(self::problem(422, 'INVALID_QR', [], ['reason' => 'NOT_SEEN']));
+
+        try {
+            $this->client(maxRetries: 0)->slips->lookup(slip: '0033000600000101030690');
+            self::fail('expected an exception');
+        } catch (UnprocessableEntityException $e) {
+            self::assertFalse(\property_exists($e, 'reason'));
+            self::assertSame('NOT_SEEN', $e->problem['reason']);
+        }
+    }
+
+    /**
+     * Guards the documentation: a customer handling a 503 needs both words and
+     * the accessor by name, in both languages.
+     */
+    public function testReadmesDocumentTheUnavailableReasons(): void
+    {
+        foreach (['README.md', 'README.th.md'] as $name) {
+            $text = self::readme($name);
+            foreach (['NOT_SEEN', 'SOURCE_DOWN', 'getReason()'] as $needle) {
+                self::assertStringContainsString($needle, $text, $name . ' is missing ' . $needle);
+            }
+        }
+    }
+
     private static function readme(string $name): string
     {
         $text = \file_get_contents(\dirname(__DIR__, 2) . '/' . $name);

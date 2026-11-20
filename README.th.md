@@ -126,10 +126,37 @@ try {
 | `UnprocessableEntityException` | 422 รวมถึง 413 และ 415 เมื่ออัปโหลดไฟล์ไม่ถูกต้อง          |
 | `RateLimitException`           | 429 มี `$retryAfter` เป็นวินาที                          |
 | `ServerException`              | 5xx ที่ไม่ใช่ 503                                        |
-| `ServiceUnavailableException`  | 503 ระบบยังอยู่ แต่ตอบไม่ได้ชั่วคราว                       |
+| `ServiceUnavailableException`  | 503 มี `$reason` และ `$retryAfter` เมื่อ API ส่งมา          |
 | `ConnectionException`          | ไม่ได้รับคำตอบเลย                                        |
 | `UnexpectedResponseException`  | คำตอบไม่ตรงรูปแบบที่ API ประกาศไว้                        |
 | `WebhookVerificationException` | ลายเซ็นหรือเวลาของ webhook ไม่ผ่าน                        |
+
+### ยังไม่ได้ผลว่าพบรายการหรือไม่ (503 `UNAVAILABLE`)
+
+ถ้าระบบธนาคารยังไม่ให้คำตอบที่ชี้ชัด การค้นครั้งนั้นจะโยน `ServiceUnavailableException` ที่ `$errorCode` เป็น `UNAVAILABLE` และไม่หักเครดิต ช่อง `$reason` (หรือเมธอด `getReason()`) บอกเหตุ และ `$retryAfter` คือเวลาที่ API ขอให้รอ
+
+| `$reason`       | หมายความว่า                                                        | `$retryAfter` |
+| --------------- | ------------------------------------------------------------------ | ------------- |
+| `"NOT_SEEN"`    | ระบบธนาคารไม่แสดงรายการนี้ ณ เวลาที่ถาม รายการที่เพิ่งโอนอาจยังไม่ขึ้น | 60 วินาที      |
+| `"SOURCE_DOWN"` | ยังไม่ได้คำตอบที่ใช้ได้จากระบบธนาคาร                                  | 30 วินาที      |
+
+```php
+use Checkslip\Exception\ServiceUnavailableException;
+
+try {
+    $check = $checkslip->slips->lookup(slip: $qr);
+} catch (ServiceUnavailableException $e) {
+    if ($e->reason === 'NOT_SEEN') {
+        // ยังไม่มีรายการให้เห็น ถามใหม่ภายหลังด้วย idempotency key เดิม
+    }
+    echo 'ถามใหม่ในอีก ' . ($e->retryAfter ?? 30) . " วินาที\n";
+    throw $e;
+}
+```
+
+ถ้า `$reason` เป็น `null` หรือเจอค่าที่ไม่รู้จัก ให้ทำแบบเดียวกับ `"SOURCE_DOWN"` · `UNAVAILABLE` ที่เกิดจากความผิดพลาดของเราเองจะไม่มีเหตุติดมาด้วย และ API เพิ่มเหตุใหม่ที่ SDK รุ่นนี้ยังไม่รู้จักได้
+
+ทุกการค้นส่ง `Idempotency-Key` ก่อนที่ exception จะมาถึงคุณ client จึงรอตาม `Retry-After` และถามซ้ำให้แล้ว (ค่าเริ่มต้น 2 ครั้ง) การค้นที่ได้ `NOT_SEEN` จึงใช้เวลากลับมาได้ราวสองนาที ถ้าอยากรอเองให้ตั้ง `maxRetries: 0`
 
 ## การลองใหม่
 
