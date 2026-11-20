@@ -26,7 +26,15 @@ final class Delivery
         public readonly ?\DateTimeImmutable $lastAttemptAt,
         public readonly ?int $lastHttpStatus,
         public readonly \DateTimeImmutable $createdAt,
-        /** The lookup this message is about. */
+        /**
+         * The id of the lookup whose result this message carries, the
+         * same as data.request_id in the slip.checked message. Use it
+         * with GET /api/slips/{request_id} to read the same result, for
+         * example when the message cannot be resent. It is null for a
+         * test message (webhook.test), which has no result to read, so
+         * do not call GET with it. It is not the X-Request-Id of the
+         * request that reads this delivery.
+         */
         public readonly ?string $requestId = null,
     ) {}
 
