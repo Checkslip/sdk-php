@@ -4,6 +4,13 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.9.0](https://github.com/Checkslip/sdk-php/compare/v0.8.1...v0.9.0) (2026-11-20)
+
+
+### Features
+
+* carry the credit lots and the other fields the API already sends ([de0f51b](https://github.com/Checkslip/sdk-php/commit/de0f51be8d2eb37fedf49a63b9e3db54846fb32a))
+
 ## [0.8.1](https://github.com/Checkslip/sdk-php/compare/v0.8.0...v0.8.1) (2026-11-20)
 
 
