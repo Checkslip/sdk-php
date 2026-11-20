@@ -19,9 +19,9 @@ final class Balance
         public readonly int $threshold,
         /**
          * How the threshold was worked out. Always null: the API stopped
-         * sending this to customers in November 2026 (billing 0.48.0), and the
-         * published API document has no such field. It stays here so code that
-         * reads it keeps working.
+         * sending this to customers in November 2026, and the published API
+         * reference does not list this field. There is no replacement field.
+         * It stays here so code that reads it keeps working.
          */
         public readonly ?string $thresholdBasis,
         public readonly ?\DateTimeImmutable $expiresAt,
