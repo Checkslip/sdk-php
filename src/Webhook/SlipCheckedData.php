@@ -19,7 +19,20 @@ use Checkslip\Model\SlipSummary;
 final class SlipCheckedData
 {
     public function __construct(
+        /**
+         * The id of this lookup, the same request_id you got when you
+         * asked for it. Use it with GET /api/slips/{request_id} to read
+         * the same result. One lookup gives one message per endpoint,
+         * so the same request_id again is the same message sent again.
+         */
         public readonly string $requestId,
+        /**
+         * The result of the transfer lookup with the bank, with the
+         * same values and meanings as outcome in GET
+         * /api/slips/{request_id}. This message carries the final
+         * result of that lookup, and today it is never PENDING, which
+         * is not in use yet.
+         */
         public readonly Outcome|string $outcome,
         public readonly \DateTimeImmutable $checkedAt,
         public readonly Channel|string $channel,
