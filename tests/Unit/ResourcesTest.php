@@ -252,11 +252,28 @@ final class ResourcesTest extends TestCase
         $page = $client->webhooks->deliveries->list(status: DeliveryStatus::Failed, eventType: EventType::SlipChecked);
         self::assertSame('status=FAILED&event_type=slip.checked', $this->lastRequest()->getUri()->getQuery());
         self::assertSame(DeliveryStatus::Succeeded, $page->items[0]->status);
+        // The lookup this message carries, for GET /api/slips/{request_id}.
+        self::assertSame('0192d4e0-0000-7000-8000-00000000d001', $page->items[0]->requestId);
 
         $detail = $client->webhooks->deliveries->get('dlv_01JBX9K2Q7M3N4P5R6S7T8V9W1');
         self::assertSame('msg_01JBX9K2Q7M3N4P5R6S7T8V9W2', $detail->payload?->id);
         self::assertSame('FOUND', $detail->payload->data['outcome'] ?? null);
         self::assertSame('SUCCESS', $detail->attempts[0]->outcome);
+    }
+
+    /**
+     * A test message has no lookup behind it, so request_id is null and a
+     * reader can tell not to call GET with it (checkslip/webhook
+     * h-mwp6pbmg810).
+     */
+    public function testATestMessageCarriesNoLookupId(): void
+    {
+        $body = \array_merge(self::fixture('delivery'), ['event_type' => 'webhook.test', 'request_id' => null]);
+        $this->http->addResponse(self::json(200, ['items' => [$body], 'next_cursor' => null]));
+
+        $page = $this->client()->webhooks->deliveries->list();
+
+        self::assertNull($page->items[0]->requestId);
     }
 
     public function testEventTypes(): void
