@@ -21,11 +21,25 @@ final class CreditEntry
         public readonly int $balanceAfter,
         public readonly ?\DateTimeImmutable $expiresAtAfter,
         public readonly CreditReason|string $reason,
+        /**
+         * Why that slip lookup used no credit, on SLIP_FREE entries only. The
+         * set is open, so we may add new values: when your code meets a value
+         * it does not know, treat it as no credit used rather than letting it
+         * break.
+         */
         public readonly FreeReason|string|null $freeReason,
         /** What caused the entry: ORDER, CHECK, STAFF or SYSTEM. */
         public readonly ?string $refType,
         public readonly ?string $refId,
         public readonly \DateTimeImmutable $createdAt,
+        /**
+         * The lot this entry added to or took from, the same as a
+         * CreditLot::$id in the balance's $lots. null on entries that did not
+         * change credits ($delta 0), on entries from before lots existed, and
+         * on entries that changed several lots at once (such as an account
+         * deletion or restore).
+         */
+        public readonly ?string $lotId = null,
     ) {}
 
     /**
@@ -43,6 +57,7 @@ final class CreditEntry
             Arr::strOrNull($d, 'ref_type'),
             Arr::strOrNull($d, 'ref_id'),
             Arr::date($d, 'created_at'),
+            Arr::strOrNull($d, 'lot_id'),
         );
     }
 }

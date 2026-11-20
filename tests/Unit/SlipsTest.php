@@ -41,6 +41,10 @@ final class SlipsTest extends TestCase
         self::assertNull($check->retryAfter);
         $slip = $check->slip;
         self::assertInstanceOf(Slip::class, $slip);
+        // The masked account number keeps the digits the bank shows in their
+        // real places, so it can be shown without guessing the shape.
+        self::assertSame('xxx-x-x0439-x', $slip->sender->accountMasked);
+        self::assertSame('xxx-x-xx968-1', $slip->receiver->accountMasked);
         self::assertSame('630210534087', $slip->transRef);
         self::assertSame(5000, $slip->amount->satang);
         self::assertSame('50.00', $slip->amount->toBaht());

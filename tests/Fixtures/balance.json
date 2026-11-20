@@ -5,5 +5,34 @@
   "threshold": 40,
   "expires_at": "2027-10-29T00:00:00+07:00",
   "updated_at": "2026-11-08T09:00:00+07:00",
-  "last_entry_id": null
+  "last_entry_id": null,
+  "credits_per_year": 1800,
+  "next_expires_at": "2027-02-01T00:00:00+07:00",
+  "lots": [
+    {
+      "id": "0192d4e0-0000-7000-8000-0000000000a1",
+      "kind": "CAMPAIGN",
+      "campaign_id": "0192d4e0-0000-7000-8000-0000000000c1",
+      "campaign_name": {
+        "th": "โปรเปิดตัว",
+        "en": "Launch offer"
+      },
+      "credits_left": 250,
+      "granted": 500,
+      "expires_at": "2027-02-01T00:00:00+07:00",
+      "usable": true,
+      "usable_today": 20
+    },
+    {
+      "id": "0192d4e0-0000-7000-8000-0000000000a2",
+      "kind": "PAID",
+      "campaign_id": null,
+      "campaign_name": null,
+      "credits_left": 1000,
+      "granted": null,
+      "expires_at": "2027-10-29T00:00:00+07:00",
+      "usable": true,
+      "usable_today": null
+    }
+  ]
 }

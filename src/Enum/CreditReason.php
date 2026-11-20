@@ -18,4 +18,7 @@ enum CreditReason: string
     case AccountDeleted = 'ACCOUNT_DELETED';
     case AccountRestored = 'ACCOUNT_RESTORED';
     case DevGrant = 'DEV_GRANT';
+    case CampaignGrant = 'CAMPAIGN_GRANT';
+    case CampaignExpire = 'CAMPAIGN_EXPIRE';
+    case CampaignReclaim = 'CAMPAIGN_RECLAIM';
 }

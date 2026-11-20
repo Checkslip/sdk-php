@@ -39,5 +39,6 @@
     "satang": 19900,
     "currency": "THB"
   },
-  "payment_method": "PROMPTPAY"
+  "payment_method": "PROMPTPAY",
+  "order_code": "ORD-7K2M9-4PQR8"
 }

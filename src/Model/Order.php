@@ -35,6 +35,12 @@ final class Order
         /** True when the payment page closed but the money has not arrived yet. */
         public readonly bool $confirming,
         public readonly ?string $reviewReason,
+        /**
+         * The order's code for people (ORD-XXXXX-XXXXX), to show and to look
+         * the order up instead of $id. Its last character is a check: one wrong
+         * character finds nothing rather than a guess.
+         */
+        public readonly string $code = '',
     ) {}
 
     /**
@@ -57,6 +63,7 @@ final class Order
             Arr::dateOrNull($d, 'cancelled_at'),
             Arr::boolOrNull($d, 'confirming') ?? false,
             Arr::strOrNull($d, 'review_reason'),
+            Arr::strOrNull($d, 'code') ?? '',
         );
     }
 }
