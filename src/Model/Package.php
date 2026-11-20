@@ -44,6 +44,13 @@ final class Package
         public readonly int $validityDays,
         public readonly bool $forSale,
         public readonly int $sort,
+        /**
+         * A time-limited lower price running now, or null when there is none.
+         * $price stays the regular price; an order opened before
+         * PackageOffer::$endsAt asks for the offer price, which $priceTotal
+         * shows. After that moment the regular price applies again on its own.
+         */
+        public readonly ?PackageOffer $offer = null,
     ) {}
 
     /**
@@ -63,6 +70,7 @@ final class Package
             Arr::int($d, 'validity_days'),
             Arr::bool($d, 'for_sale'),
             Arr::int($d, 'sort'),
+            ($offer = Arr::objOrNull($d, 'offer')) !== null ? PackageOffer::fromArray($offer) : null,
         );
     }
 }

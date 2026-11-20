@@ -26,6 +26,8 @@ final class Delivery
         public readonly ?\DateTimeImmutable $lastAttemptAt,
         public readonly ?int $lastHttpStatus,
         public readonly \DateTimeImmutable $createdAt,
+        /** The lookup this message is about. */
+        public readonly ?string $requestId = null,
     ) {}
 
     /**
@@ -44,6 +46,7 @@ final class Delivery
             Arr::dateOrNull($d, 'last_attempt_at'),
             Arr::intOrNull($d, 'last_http_status'),
             Arr::date($d, 'created_at'),
+            Arr::strOrNull($d, 'request_id'),
         );
     }
 }

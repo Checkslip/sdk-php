@@ -22,7 +22,19 @@
       "credits": 100,
       "validity_days": 365,
       "for_sale": true,
-      "sort": 1
+      "sort": 1,
+      "offer": {
+        "price": {
+          "satang": 14900,
+          "currency": "THB"
+        },
+        "price_per_credit": {
+          "satang": 15,
+          "currency": "THB"
+        },
+        "price_per_credit_baht": "0.149",
+        "ends_at": "2026-12-01T00:00:00+07:00"
+      }
     }
   ],
   "vat_rate_bp": 700

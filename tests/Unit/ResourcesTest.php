@@ -10,6 +10,7 @@ use Checkslip\Enum\CreditReason;
 use Checkslip\Enum\DeliveryStatus;
 use Checkslip\Enum\EventType;
 use Checkslip\Enum\ExportState;
+use Checkslip\Enum\LotKind;
 use Checkslip\Enum\OrderStatus;
 use Checkslip\Enum\PaymentMethod;
 use Checkslip\Enum\Stream;
@@ -18,6 +19,8 @@ use Checkslip\Model\ApiRequestRecord;
 use Checkslip\Model\AuditEventRecord;
 use Checkslip\Model\BillingInfo;
 use Checkslip\Model\Order;
+use Checkslip\Model\PackageOffer;
+use Checkslip\Model\ThEn;
 use Checkslip\Tests\TestCase;
 use GuzzleHttp\Psr7\Response;
 
@@ -34,6 +37,30 @@ final class ResourcesTest extends TestCase
         // 0.48.0 (9 Nov 2026). While this was a required string, the call threw
         // UnexpectedResponseException for every customer.
         self::assertNull($b->thresholdBasis);
+
+        // The lots behind that total (billing contract 0.72.1): the campaign
+        // lot is charged first because it expires first, and $credits is their
+        // sum.
+        self::assertSame(1800, $b->creditsPerYear);
+        self::assertCount(2, $b->lots);
+        $campaignLot = $b->lots[0];
+        self::assertSame(LotKind::Campaign, $campaignLot->kind);
+        self::assertSame(250, $campaignLot->creditsLeft);
+        self::assertSame(500, $campaignLot->granted);
+        self::assertSame(20, $campaignLot->usableToday);
+        self::assertInstanceOf(ThEn::class, $campaignLot->campaignName);
+        self::assertSame('Launch offer', $campaignLot->campaignName->en);
+        self::assertSame('โปรเปิดตัว', $campaignLot->campaignName->th);
+        // The paid lot has no campaign and no daily number, and null is not 0:
+        // a reader can tell "no limit" from "nothing left today".
+        $paidLot = $b->lots[1];
+        self::assertSame(LotKind::Paid, $paidLot->kind);
+        self::assertNull($paidLot->campaignId);
+        self::assertNull($paidLot->campaignName);
+        self::assertNull($paidLot->granted);
+        self::assertNull($paidLot->usableToday);
+        self::assertSame($b->credits, $campaignLot->creditsLeft + $paidLot->creditsLeft);
+        self::assertSame('2027-02-01', $b->nextExpiresAt?->format('Y-m-d'));
         self::assertSame('2027-10-29', $b->expiresAt?->format('Y-m-d'));
     }
 
@@ -111,11 +138,20 @@ final class ResourcesTest extends TestCase
         self::assertSame(700, $packages->vatRateBp);
         self::assertSame('212.93', $packages->items[0]->priceTotal->toBaht());
         self::assertSame('1.990', $packages->items[0]->pricePerCreditBaht);
+        // An offer running now: the regular price stays, and the amount to pay
+        // comes from $priceTotal, never from multiplying the per-credit price.
+        $offer = $packages->items[0]->offer;
+        self::assertInstanceOf(PackageOffer::class, $offer);
+        self::assertSame('149.00', $offer->price->toBaht());
+        self::assertSame('0.149', $offer->pricePerCreditBaht);
+        self::assertSame('2026-12-01', $offer->endsAt->format('Y-m-d'));
 
         $orders = $billing->orders->list(status: OrderStatus::Paid);
         self::assertSame('status=PAID', $this->lastRequest()->getUri()->getQuery());
         self::assertInstanceOf(Order::class, $orders->items[0]);
         self::assertSame(PaymentMethod::PromptPay, $orders->items[0]->paymentMethod);
+        // The code a customer sees and can quote, rather than the uuid.
+        self::assertSame('ORD-7K2M9-4PQR8', $orders->items[0]->code);
         // VAT sits inside $amount: the fixture's 13.02 is the VAT within
         // 199.00, not a surcharge on it.
         self::assertSame('13.02', $orders->items[0]->vat?->toBaht());
@@ -127,6 +163,9 @@ final class ResourcesTest extends TestCase
 
         $receipt = $billing->receipts->get('0192d4e0-0000-7000-8000-0000000000d2');
         self::assertSame(700, $receipt->vat?->rateBp);
+        // The order code, for pointing at the order. The legal number stays
+        // $receiptNo.
+        self::assertSame('ORD-7K2M9-4PQR8', $receipt->orderCode);
         self::assertSame('บริษัท โฮโลแกรม จำกัด', $receipt->seller['name']);
         self::assertSame(BuyerType::Company, $receipt->buyer->buyerType);
     }
