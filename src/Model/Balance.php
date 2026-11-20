@@ -17,8 +17,13 @@ final class Balance
         /** True when $credits is at or below $threshold. */
         public readonly bool $low,
         public readonly int $threshold,
-        /** How the threshold was worked out: AVG_7_DAYS, FALLBACK_10_PERCENT or NONE. */
-        public readonly string $thresholdBasis,
+        /**
+         * How the threshold was worked out. Always null: the API stopped
+         * sending this to customers in November 2026 (billing 0.48.0), and the
+         * published API document has no such field. It stays here so code that
+         * reads it keeps working.
+         */
+        public readonly ?string $thresholdBasis,
         public readonly ?\DateTimeImmutable $expiresAt,
         public readonly \DateTimeImmutable $updatedAt,
     ) {}
@@ -33,7 +38,7 @@ final class Balance
             Arr::int($d, 'credits'),
             Arr::bool($d, 'low'),
             Arr::int($d, 'threshold'),
-            Arr::str($d, 'threshold_basis'),
+            Arr::strOrNull($d, 'threshold_basis'),
             Arr::dateOrNull($d, 'expires_at'),
             Arr::date($d, 'updated_at'),
         );

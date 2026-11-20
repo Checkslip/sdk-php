@@ -30,8 +30,23 @@ final class ResourcesTest extends TestCase
 
         self::assertSame(1250, $b->credits);
         self::assertFalse($b->low);
-        self::assertSame('AVG_7_DAYS', $b->thresholdBasis);
+        // The live answer carries no threshold_basis, and has not since billing
+        // 0.48.0 (9 Nov 2026). While this was a required string, the call threw
+        // UnexpectedResponseException for every customer.
+        self::assertNull($b->thresholdBasis);
         self::assertSame('2027-10-29', $b->expiresAt?->format('Y-m-d'));
+    }
+
+    /**
+     * The property is nullable now, not gone: a body that still carries the
+     * word reads through, so an older server does not break the call.
+     */
+    public function testBalanceStillReadsAThresholdBasisWhenOneArrives(): void
+    {
+        $this->http->addResponse(self::json(200, self::fixture('balance') + ['threshold_basis' => 'AVG_7_DAYS']));
+        $b = $this->client()->billing->balance->get();
+
+        self::assertSame('AVG_7_DAYS', $b->thresholdBasis);
     }
 
     public function testUsageSendsDatesAndReadsBuckets(): void
