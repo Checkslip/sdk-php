@@ -4,6 +4,13 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.8.0](https://github.com/Checkslip/sdk-php/compare/v0.7.2...v0.8.0) (2026-11-20)
+
+
+### Features
+
+* read the reason a lookup has no definite answer ([51bf601](https://github.com/Checkslip/sdk-php/commit/51bf60110f55b9db023da59a4cf6cc4dd03f9d3d))
+
 ## [0.7.2](https://github.com/Checkslip/sdk-php/compare/v0.7.1...v0.7.2) (2026-11-18)
 
 
