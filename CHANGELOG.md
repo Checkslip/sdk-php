@@ -4,6 +4,14 @@ All notable changes to this package are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org).
 
+## [0.8.1](https://github.com/Checkslip/sdk-php/compare/v0.8.0...v0.8.1) (2026-11-20)
+
+
+### Bug Fixes
+
+* read a balance that carries no threshold_basis ([e2f71e6](https://github.com/Checkslip/sdk-php/commit/e2f71e61a104f932f05b9c22cd3e395401b9883f))
+* `Balance::$thresholdBasis` is now `?string`. The API stopped sending the field to customers, so it is always `null`; code that passes it somewhere expecting a string needs a null check. Reading a balance at all was throwing `UnexpectedResponseException` before this.
+
 ## [0.8.0](https://github.com/Checkslip/sdk-php/compare/v0.7.2...v0.8.0) (2026-11-20)
 
 
