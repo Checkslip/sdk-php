@@ -126,10 +126,37 @@ try {
 | `UnprocessableEntityException`    | 422, and 413 or 415 for a bad upload                              |
 | `RateLimitException`              | 429, with `$retryAfter` in seconds                                |
 | `ServerException`                 | 5xx other than 503                                                |
-| `ServiceUnavailableException`     | 503, up but temporarily unable to serve                           |
+| `ServiceUnavailableException`     | 503, with `$reason` and `$retryAfter` when the API sends them      |
 | `ConnectionException`             | no response arrived                                               |
 | `UnexpectedResponseException`     | the response was not the shape the API documents                  |
 | `WebhookVerificationException`    | a webhook signature or timestamp did not check out                |
+
+### No definite answer (503 `UNAVAILABLE`)
+
+A lookup the banking system does not settle throws `ServiceUnavailableException` with `$errorCode` `UNAVAILABLE`, and uses no credit. `$reason` (or `getReason()`) says why, and `$retryAfter` is the wait the API asked for.
+
+| `$reason`       | What it means                                                                                                       | `$retryAfter` |
+| --------------- | ------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `"NOT_SEEN"`    | The banking system does not show this transfer at the time of the lookup. One made moments ago may not be there yet. | 60 s          |
+| `"SOURCE_DOWN"` | No usable answer from the banking system.                                                                           | 30 s          |
+
+```php
+use Checkslip\Exception\ServiceUnavailableException;
+
+try {
+    $check = $checkslip->slips->lookup(slip: $qr);
+} catch (ServiceUnavailableException $e) {
+    if ($e->reason === 'NOT_SEEN') {
+        // Nothing to show yet. Ask again later with the same idempotency key.
+    }
+    echo 'ask again in ' . ($e->retryAfter ?? 30) . " s\n";
+    throw $e;
+}
+```
+
+Handle a `null` or unknown reason the way you handle `"SOURCE_DOWN"`. An `UNAVAILABLE` that comes from a failure of ours carries no reason at all, and the API can add reasons this release of the SDK does not list.
+
+Every lookup sends an `Idempotency-Key`, so the client has already waited out `Retry-After` and asked again (twice by default) before the exception reaches you: a `NOT_SEEN` lookup can take about two minutes to come back. Set `maxRetries: 0` to do that waiting yourself.
 
 ## Retries
 
